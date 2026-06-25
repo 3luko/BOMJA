@@ -1,4 +1,5 @@
 
+
 let slideIndex = 0;
 showSlides();
 
@@ -19,3 +20,9 @@ function showSlides() {
 
     setTimeout(showSlides, 4000); // Change image every 4 seconds
 }
+
+window.addEventListener("load", () => {
+    if (window.instgrm) {
+        window.instgrm.Embeds.process();
+    }
+});
