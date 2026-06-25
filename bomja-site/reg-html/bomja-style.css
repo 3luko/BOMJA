@@ -137,7 +137,48 @@
         position:relative;
         overflow:hidden
     }
-    
+
+
+.socials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 420px));
+    gap: 32px;
+    justify-content: center;
+    align-items: start;
+    margin-top: 35px;
+}
+
+.instagram-embed-card,
+.tiktok-embed-card {
+    background: rgba(17, 17, 17, 0.92);
+    border: 1px solid rgba(239, 122, 35, 0.35);
+    border-radius: 26px;
+    padding: 18px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+.instagram-embed-card blockquote,
+.tiktok-embed-card blockquote {
+    max-width: 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+@media (max-width: 850px) {
+    .socials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .instagram-embed-card,
+    .tiktok-embed-card {
+        margin: 0 auto;
+        max-width: 420px;
+    }
+}
+
     .hero-card:before{
         content:"";
         position:absolute;

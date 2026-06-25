@@ -1,0 +1,287 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background: #b60000;
+    color: white;
+}
+
+header {
+    width: 100%;
+    background: #b60000;
+    padding: 20px 7%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.brand img {
+    width: 70px;
+    height: auto;
+}
+
+.navlinks {
+    display: flex;
+    gap: 32px;
+}
+
+.navlinks a {
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.navlinks a:hover {
+    color: #111;
+}
+
+.ticket-btn,
+.main-btn {
+    background: #111;
+    color: white;
+    padding: 13px 24px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.ticket-btn:hover,
+.main-btn:hover {
+    background: white;
+    color: #b60000;
+}
+
+.slideshow {
+    position: relative;
+    height: 680px;
+    overflow: hidden;
+}
+
+.slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.slide.active {
+    display: block;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 7%;
+}
+
+.kicker {
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.slide-overlay h1 {
+    font-size: clamp(3rem, 8vw, 7rem);
+    max-width: 850px;
+    line-height: 0.95;
+    margin-bottom: 24px;
+}
+
+.slide-overlay p {
+    font-size: 1.3rem;
+    max-width: 600px;
+    margin-bottom: 28px;
+}
+
+section {
+    padding: 90px 7%;
+}
+
+.story-section {
+    text-align: center;
+}
+
+.story-section h2,
+.events-section h2,
+.social-section h2 {
+    font-size: 4rem;
+    margin-bottom: 25px;
+}
+
+.story-section > p {
+    max-width: 850px;
+    margin: 0 auto 18px;
+    font-size: 1.25rem;
+    line-height: 1.7;
+}
+
+.story-grid,
+.event-grid,
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    margin-top: 50px;
+}
+
+.story-card,
+.event-card,
+.social-box {
+    background: #111;
+    padding: 32px;
+    border-radius: 24px;
+}
+
+.story-card h3,
+.event-card h3,
+.social-box h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.story-card p,
+.event-card p,
+.social-box p {
+    line-height: 1.6;
+    color: #ddd;
+}
+
+.event-card img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 18px;
+    margin-bottom: 22px;
+}
+
+.upcoming-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    background: #111;
+}
+
+.upcoming-content h2 {
+    font-size: 4.5rem;
+    margin-bottom: 20px;
+}
+
+.upcoming-content p {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    margin-bottom: 22px;
+}
+
+.upcoming-image img {
+    width: 100%;
+    border-radius: 28px;
+}
+
+.social-box {
+    min-height: 320px;
+    border: 2px dashed rgba(255, 255, 255, 0.35);
+}
+
+footer {
+    padding: 70px 7%;
+    text-align: center;
+    background: #111;
+}
+
+footer h2 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.footer-socials {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin: 35px 0;
+}
+
+.footer-socials a {
+    background: white;
+    color: #b60000;
+    width: 135px;
+    height: 48px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.footer-socials a:hover {
+    background: #b60000;
+    color: white;
+}
+
+.copyright {
+    color: #aaa;
+}
+
+@media (max-width: 850px) {
+    .navlinks {
+        display: none;
+    }
+
+    .slideshow {
+        height: 560px;
+    }
+
+    .story-grid,
+    .event-grid,
+    .social-grid,
+    .upcoming-section {
+        grid-template-columns: 1fr;
+    }
+
+    .slide-overlay h1,
+    .upcoming-content h2 {
+        font-size: 3.5rem;
+    }
+
+    .footer-socials {
+        flex-direction: column;
+        align-items: center;
+    }
+}
