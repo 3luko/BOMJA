@@ -1,6 +1,11 @@
 
 
 let slideIndex = 0;
+
+const videos = document.querySelectorAll(".social-video");
+
+
+
 showSlides();
 
 function showSlides() {
@@ -25,4 +30,31 @@ window.addEventListener("load", () => {
     if (window.instgrm) {
         window.instgrm.Embeds.process();
     }
+});
+
+
+// Intersection Observer to play/pause videos based on visibility
+const videoObserver = new IntersectionObserver(
+    (entries) => {
+
+        entries.forEach((entry) => {
+
+            const video = entry.target;
+
+            if (entry.isIntersecting) {
+                video.play().catch(() => {});
+            } else {
+                video.pause();
+            }
+
+        });
+
+    },
+    {
+        threshold: 0.6
+    }
+);
+
+videos.forEach((video) => {
+    videoObserver.observe(video);
 });
