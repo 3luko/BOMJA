@@ -14,7 +14,7 @@
     <header>
         <nav>
             <a class="brand" href="#">
-                <img src="assets\logos\unnamed (2).png" alt="Brand logo">
+                <img src="assets/logos/unnamed (2).png" alt="Brand logo">
                 BOMJA
             </a>
 
@@ -26,26 +26,40 @@
                 
             </div>
 
-            <a class="btn" href="https://your-ticket-link.com">
+            <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <a class="btn nav-ticket" href="https://your-ticket-link.com">
                 Tickets
             </a>
         </nav>
+
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#events">Events</a>
+            <a href="#about">About</a>
+            <a href="#socials">Socials</a>
+            <a href="#list">Email List</a>
+            <a class="btn" href="https://your-ticket-link.com">Tickets</a>
+        </div>
     </header>
     <section class="slideshow">
     <div class="slides fade">
-        <img src="assets\BOMJA001-21.png" alt="">
+        <img src="assets/BOMJA001-21.png" alt="">
     </div>
 
     <div class="slides fade">
-        <img src="assets\BOMJA002-93.png" alt="">
+        <img src="assets/BOMJA002-93.png" alt="">
     </div>
 
     <div class="slides fade">
-        <img src="assets\BOMJA001-40.png" alt="">
+        <img src="assets/BOMJA001-40.png" alt="">
     </div>
 
     <div class="slides fade">
-        <img src="assets\BOMJA001-43.png" alt="">
+        <img src="assets/BOMJA001-43.png" alt="">
     </div>
 
     <div class="overlay">
@@ -54,13 +68,16 @@
     </div>
 </section>
 
-<section class="events">
+<section class="events" id="events">
     <div class="section-title">
         Upcoming Events
     </div>
 
-    <div>
-        <img src="assets\Brunch_In_Gold.jpg" alt="A brief description of your image">
+    <div class="upcoming-events">
+        <img src="assets/Brunch_In_Gold.jpg" alt="BOMJA Brunch in Gold event flyer" loading="lazy">
+        <img src="assets/Runclub_Bomja.jpg" alt="BOMJA weekly run club event flyer" loading="lazy">
+        
+
 
     </div>
 
@@ -101,7 +118,7 @@
     </div>
 
     <div class="hero-card">
-        <img src="assets\logos\unnamed (2).png" alt="BOMJA logo">
+        <img src="assets/logos/unnamed (2).png" alt="BOMJA logo">
 
         <div class="event">
             <h2>Welcome to BOMJA</h2>
@@ -197,7 +214,7 @@
                             <div class="video-thumbnail">
 
                                 <video
-                                    class="tiktok-video"
+                                    class="tiktok-video social-video"
                                     controls
                                     muted
                                     loop
@@ -205,7 +222,7 @@
                                     preload="metadata"
                                 >
                                     <source
-                                        src="assets\tiktokPrevBomja.mp4"
+                                        src="assets/tiktokPrevBomja.mp4"
                                         type="video/mp4"
                                     >
                                 </video>
@@ -259,18 +276,23 @@
                         </div>
 
             <div class="reel__container">
-                
+
+                <img
+                    src="assets/logos/instagramlogo.png"
+                    class="instagram-logo"
+                    alt="Instagram"
+                >
 
                 <!-- Your video goes here -->
                 <video
-                    class="reel__video"
+                    class="reel__video social-video"
                     controls
                     muted
                     loop
                     playsinline
                     preload="metadata"
                 >
-                    <source src="assets\insta_video_30509.mp4" type="video/mp4">
+                    <source src="assets/insta_video_30509.mp4" type="video/mp4">
                 </video>
 
                 <div class="reel__title">
@@ -385,7 +407,7 @@
 
                         <!-- Audio Cover -->
                         <img
-                            src="assets\logos\unnamed.png"
+                            src="assets/logos/unnamed.png"
                             class="reel__audio-cover"
                             alt="Audio Cover"
                         >
