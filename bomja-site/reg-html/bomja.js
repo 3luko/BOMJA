@@ -58,3 +58,25 @@ const videoObserver = new IntersectionObserver(
 videos.forEach((video) => {
     videoObserver.observe(video);
 });
+
+// Mobile navigation
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileMenu = document.querySelector('.mobile-menu');
+
+if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.toggle('is-open');
+        menuToggle.classList.toggle('is-open', isOpen);
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('is-open');
+            menuToggle.classList.remove('is-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Open navigation');
+        });
+    });
+}
