@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+
+
+<body class="dashboard-page">
+
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+
+        <h1>Admin Dashboard</h1>
+
+        <a href="/bomja1" class="logout-btn">
+            Logout
+        </a>
+
+    </div>
+
+
+
+    <div class="container">
+
+
+        <!-- Upload Card -->
+        <div class="card">
+
+            <h2>
+                Upload New Image
+            </h2>
+
+
+            <!-- 
+                This form sends the image to Flask.
+
+                enctype="multipart/form-data"
+                is required for file uploads.
+            -->
+
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+
+
+                <label>
+                    Choose Image:
+                </label>
+
+
+                <input 
+                    type="file"
+                    name="image"
+                    id="imageInput"
+                    accept="image/png, image/jpeg, image/webp"
+                    required
+                >
+
+
+                <!-- Image Preview -->
+                <img id="preview">
+
+
+                <br><br>
+
+
+                <button type="submit">
+                    Upload Image
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+
+
+        <!-- Future Features -->
+        <div class="card">
+
+            <h2>
+                Bomja Management
+            </h2>
+
+
+            <p>
+                Future features can go here:
+            </p>
+
+
+            <ul>
+
+                <li>
+                    Delete images
+                </li>
+
+                <li>
+                    Update homepage banner
+                </li>
+
+                <li>
+                    View analytics
+                </li>
+
+            </ul>
+
+
+        </div>
+
+
+    </div>
+
+
+
+<script>
+
+    /*
+        Shows a preview of the image
+        before uploading it.
+    */
+
+    const imageInput = document.getElementById("imageInput");
+
+    const preview = document.getElementById("preview");
+
+
+    imageInput.addEventListener("change", function(){
+
+        const file = this.files[0];
+
+
+        if(file){
+
+            preview.src = URL.createObjectURL(file);
+
+            preview.style.display = "block";
+
+        }
+
+    });
+
+
+</script>
+
+
+</body>
+
+</html>
