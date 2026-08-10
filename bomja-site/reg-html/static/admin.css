@@ -35,6 +35,13 @@ body {
     box-sizing: border-box;
 }
 
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    /* your other button styling */
+}
+
 .message {
     min-height: 20px;
     margin-top: 8px;

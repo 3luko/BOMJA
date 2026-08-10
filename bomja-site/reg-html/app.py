@@ -3,12 +3,19 @@ from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+import json
 
 
 #SETUP
 BASE_DIR = Path(__file__).resolve().parent
-load_dotenv(BASE_DIR / ".env", override=True)
-UPLOAD_FOLDER = BASE_DIR.parent / "assets"
+ENV_PATH = BASE_DIR / ".env"
+load_dotenv(ENV_PATH, override=True)
+
+
+
+UPLOAD_FOLDER = BASE_DIR / "static" / "uploads"
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+JSON_FILE = BASE_DIR / "static" / "data" / "events.json"
 
 #Creating Flask app and Bcrypt instance
 app = Flask(__name__)
@@ -17,8 +24,12 @@ bcrypt = Bcrypt(app)
 
 #Env variables
 app.secret_key = os.getenv("SECRET_KEY")
-PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH")
+MYPASS = os.getenv("ADMIN_PASSWORD_HASH")
+
+
 print("http://127.0.0.1:5000")
+
+  
 
 
 #Route for home page
@@ -41,14 +52,12 @@ def login():
             print("Password is required", flush=True)
             return "Password is required", 400
 
-        print("Password entered:", password)
-
         # Check the password
-        if bcrypt.check_password_hash(PASSWORD_HASH, password):
+        if MYPASS == password:
             print("Correct password", flush=True)
 
             session.clear()
-            session["admin"] = True
+            session["admin"] = True        
 
             return redirect(url_for("dashboard"))
 
@@ -70,6 +79,46 @@ def dashboard():
         return redirect(url_for("home"))
 
     return render_template("dashboard.html")
+
+
+#ROute for image upload
+@app.route("/admin/upload", methods=["POST"])
+def upload_image():
+
+    # Get the uploaded file
+    file = request.files["image"]
+
+    # Get the alt text from the form
+    alt_text = request.form["alt"]
+
+    # Save the actual image
+    file.save(UPLOAD_FOLDER / file.filename)
+
+    # Add image information to JSON
+    add_image_to_json(
+        file.filename,
+        alt_text
+    )
+
+    return redirect(url_for("dashboard"))
+
+
+
+#FUNCTION for adding image information to JSON
+def add_image_to_json(filename, alt_text):
+    # Open the existing JSON file
+    with open(JSON_FILE, "r") as file:
+        images = json.load(file)
+
+    # Add the new image to the list
+    images.append({
+        "image": filename,
+        "alt": alt_text
+    })
+
+    # Write the updated list back to the JSON file
+    with open(JSON_FILE, "w") as file:
+        json.dump(images, file, indent=4)
 
 
 #Route for logoout page
