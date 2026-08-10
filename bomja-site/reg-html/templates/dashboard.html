@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 
 </head>
 
 
-<body class="dashboard-page">
+<body>
 
 
     <!-- Navigation Bar -->
@@ -19,7 +23,7 @@
         <h1>Admin Dashboard</h1>
 
         <a href="{{ url_for('home') }}" class="logout-btn">
-            Go back
+            Go Back
         </a>
 
     </div>
@@ -29,134 +33,244 @@
     <div class="container">
 
 
-        <!-- Upload Card -->
-        <div class="card">
+    
+<!-- Upcoming Events Section -->
+<div class="card events-card">
+
+    <div class="section-header">
+
+        <div>
 
             <h2>
-                Upload New Image
+                Upcoming Events
             </h2>
 
+            <p>
+                Manage the events currently displayed on the website.
+            </p>
 
-            <!-- 
-                This form sends the image to Flask.
-
-                enctype="multipart/form-data"
-                is required for file uploads.
-            -->
-
-            <form action="{{ url_for('upload_image') }}" method="POST" enctype="multipart/form-data">
+        </div>
 
 
-                <label>
-                    Choose Image:
-                </label>
+        <!-- Add Event Button -->
+        <button
+            type="button"
+            class="add-event-btn"
+            onclick="openAddEvent()"
+        >
+            + Add Event
+        </button>
+
+    </div>
 
 
-                <input 
-                    type="file"
+
+    <!-- Events List -->
+    <div class="events-list">
+
+
+        {% for event in events %}
+
+        <div class="event-item">
+
+
+            <!-- Event Information -->
+            <div class="event-info">
+
+                <h3>
+                    {{ event.alt }}
+                </h3>
+
+                <p>
+                    {{ event.image }}
+                </p>
+
+            </div>
+
+
+            <form
+                action="{{ url_for('delete_image', filename=event.image) }}"
+                method="POST"
+                onsubmit="return confirm('Are you sure you want to remove this event?');"
+            >
+
+                <input
+                    type="hidden"
                     name="image"
-                    id="imageInput"
-                    accept="image/png, image/jpeg, image/webp"
-                    required
+                    value="{{ event.image }}"
                 >
 
-
-                <!-- Image Preview -->
-                <img id="preview">
-
-
-                <br><br>
-
-                <input 
-                    type="text"
-                    name="alt"
-                    id="altTextInput"
-                    placeholder="Enter alt text for the image"
-                    required
-
+                <button
+                    type="submit"
+                    class="remove-event-btn"
                 >
-                <br><br>
-
-                <button type="submit">
-                    Upload Image
+                    Remove Event
                 </button>
-
 
             </form>
 
 
-        </div>
-
-
-
-        <!-- Future Features -->
-        <div class="card">
-
-            <h2>
-                Bomja Management
-            </h2>
-
-
-            <p>
-                Future features can go here:
-            </p>
-
-
-            <ul>
-
-                <li>
-                    Delete images
-                </li>
-
-                <li>
-                    Update homepage banner
-                </li>
-
-                <li>
-                    View analytics
-                </li>
-
-            </ul>
 
 
         </div>
+
+        {% endfor %}
 
 
     </div>
 
 
 
+    <!-- Message shown when there are no events -->
+    {% if not events %}
+
+    <div class="no-events">
+
+        <h3>
+            No Upcoming Events
+        </h3>
+
+        <p>
+            Add an event to display it here.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- Add Event Section -->
+<div
+    class="card add-event-panel"
+    id="addEventPanel"
+    style="display: none;"
+>
+
+    <h2>
+        Add Event
+    </h2>
+
+
+    <p>
+        Upload an image to add it
+        to the upcoming events section.
+    </p>
+
+
+    <form
+        action="{{ url_for('upload_image') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <label for="eventImage">
+            Event Image
+        </label>
+
+
+        <input
+            type="file"
+            name="image"
+            id="eventImage"
+            accept="image/png, image/jpeg, image/webp"
+            required
+
+
+
+        <br><br>
+
+
+
+        <label for="eventAlt">
+            Alt Text
+        </label>
+
+
+        <input
+            type="text"
+            name="alt"
+            id="eventAlt"
+            placeholder="Enter alt text"
+        >
+
+
+
+        <br><br>
+
+
+        <div class="form-buttons">
+
+            <button
+                type="submit"
+                class="save-event-btn"
+            >
+                Add Event
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-btn"
+                onclick="closeAddEvent()"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
 <script>
 
-    /*
-        Shows a preview of the image
-        before uploading it.
-    */
+    function openAddEvent() {
 
-    const imageInput = document.getElementById("imageInput");
+        document.getElementById("addEventPanel").style.display = "block";
 
-    const preview = document.getElementById("preview");
+    }
 
 
-    imageInput.addEventListener("change", function(){
+    function closeAddEvent() {
 
-        const file = this.files[0];
+        document.getElementById("addEventPanel").style.display = "none";
+
+    }
 
 
-        if(file){
+    function removeEvent(imageName) {
 
-            preview.src = URL.createObjectURL(file);
+        /*
+            This is only the front-end for now.
 
-            preview.style.display = "block";
+            Later, this function will send the image name
+            to Flask so Flask can remove the event from
+            events.json.
+        */
+
+        const confirmed = confirm(
+            "Are you sure you want to remove this event?"
+        );
+
+
+        if (confirmed) {
+
+            alert(
+                "Remove functionality will be connected to Flask next."
+            );
 
         }
 
-    });
-
+    }
 
 </script>
-
-
 </body>
 
 </html>
+

@@ -64,17 +64,36 @@ button:hover {
     background-color: #555;
 }
 
-.dashboard-page {
-    background-color: #f4f4f4;
+
+/* ========================================
+   GENERAL PAGE
+======================================== */
+
+* {
+    box-sizing: border-box;
 }
 
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f5f5;
+    color: #222;
+}
+
+
+/* ========================================
+   NAVIGATION BAR
+======================================== */
+
 .navbar {
-    background-color: #222;
-    color: white;
-    padding: 15px 30px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 40px;
+
+    background-color: #111;
+    color: white;
 }
 
 .navbar h1 {
@@ -82,46 +101,403 @@ button:hover {
     font-size: 24px;
 }
 
+
+/* Go Back Button */
+
 .logout-btn {
-    background-color: #d9534f;
-    color: white;
-    padding: 10px 15px;
     text-decoration: none;
-    border-radius: 5px;
+
+    padding: 10px 18px;
+
+    background-color: white;
+    color: #111;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
 }
 
 .logout-btn:hover {
-    background-color: #c9302c;
+    background-color: #ddd;
 }
 
+
+/* ========================================
+   MAIN CONTAINER
+======================================== */
+
 .container {
-    width: 80%;
+    width: 90%;
+    max-width: 1000px;
+
     margin: 40px auto;
 }
 
+
+/* ========================================
+   CARD
+======================================== */
+
 .card {
     background-color: white;
+
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+
+    margin-bottom: 25px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-.card h2 {
+
+/* ========================================
+   SECTION HEADER
+======================================== */
+
+.section-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.section-header h2 {
+    margin: 0 0 6px 0;
+
+    font-size: 22px;
+}
+
+.section-header p {
+    margin: 0;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* ========================================
+   ADD EVENT BUTTON
+======================================== */
+
+.add-event-btn {
+    border: none;
+
+    padding: 11px 18px;
+
+    border-radius: 7px;
+
+    background-color: #111;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.add-event-btn:hover {
+    background-color: #333;
+
+    transform: translateY(-1px);
+}
+
+
+/* ========================================
+   EVENTS LIST
+======================================== */
+
+.events-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+/* Individual Event */
+
+.event-item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 8px;
+
+    background-color: #fafafa;
+
+    transition: 0.2s ease;
+}
+
+.event-item:hover {
+    background-color: #f2f2f2;
+
+    border-color: #d5d5d5;
+}
+
+
+/* ========================================
+   EVENT INFORMATION
+======================================== */
+
+.event-info {
+    flex: 1;
+}
+
+.event-info h3 {
+    margin: 0 0 5px 0;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #222;
+}
+
+.event-info p {
+    margin: 0;
+
+    font-size: 13px;
+
+    color: #888;
+}
+
+
+/* ========================================
+   REMOVE EVENT BUTTON
+======================================== */
+
+.remove-event-btn {
+    border: none;
+
+    padding: 9px 14px;
+
+    border-radius: 6px;
+
+    background-color: #e53935;
+    color: white;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.remove-event-btn:hover {
+    background-color: #c62828;
+
+    transform: translateY(-1px);
+}
+
+
+/* ========================================
+   NO EVENTS MESSAGE
+======================================== */
+
+.no-events {
+    text-align: center;
+
+    padding: 40px 20px;
+
+    border: 2px dashed #ddd;
+
+    border-radius: 8px;
+
+    color: #777;
+}
+
+.no-events h3 {
+    margin: 0 0 8px 0;
+
+    color: #444;
+}
+
+.no-events p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* ========================================
+   ADD EVENT PANEL
+======================================== */
+
+.add-event-panel h2 {
     margin-top: 0;
 }
 
-input[type="file"] {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    margin-bottom: 20px;
+.add-event-panel p {
+    color: #777;
+
+    font-size: 14px;
 }
 
-#preview {
-    max-width: 300px;
-    margin-top: 20px;
-    display: none;
-    border-radius: 10px;
+
+/* ========================================
+   FORM ELEMENTS
+======================================== */
+
+.add-event-panel label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: 600;
 }
+
+
+.add-event-panel select,
+.add-event-panel input {
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    background-color: white;
+
+    transition: 0.2s ease;
+}
+
+
+.add-event-panel select:focus,
+.add-event-panel input:focus {
+    border-color: #111;
+
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ========================================
+   FORM BUTTONS
+======================================== */
+
+.form-buttons {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.save-event-btn,
+.cancel-btn {
+    border: none;
+
+    padding: 10px 18px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+/* Save */
+
+.save-event-btn {
+    background-color: #111;
+
+    color: white;
+}
+
+.save-event-btn:hover {
+    background-color: #333;
+}
+
+
+/* Cancel */
+
+.cancel-btn {
+    background-color: #e5e5e5;
+
+    color: #222;
+}
+
+.cancel-btn:hover {
+    background-color: #d5d5d5;
+}
+
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+======================================== */
+
+@media (max-width: 600px) {
+
+    .navbar {
+        padding: 18px 20px;
+    }
+
+    .navbar h1 {
+        font-size: 20px;
+    }
+
+    .container {
+        width: 94%;
+
+        margin: 25px auto;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .section-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .add-event-btn {
+        width: 100%;
+    }
+
+    .event-item {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 15px;
+    }
+
+    .remove-event-btn {
+        width: 100%;
+    }
+
+}
+
