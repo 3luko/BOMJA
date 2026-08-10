@@ -15,7 +15,7 @@ if (!upcomingEvents) {
             events.forEach(event => {
                 const img = document.createElement("img");
 
-                img.src = `static/visuals/${event.image}`;
+                img.src = `static/uploads/${event.image}`;
                 img.alt = event.alt || "BOMJA upcoming event flyer";
                 img.loading = "lazy";
 

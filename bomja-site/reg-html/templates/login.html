@@ -19,12 +19,13 @@
                 placeholder="Enter Admin Password"
                 required
             >
-
             <button type="submit">Login</button>
             <p id="loginMessage" class="message" aria-live="polite"></p>
         </form>
 
-        <button onclick="window.location.href='../bomja1.html'">Go back</button>
+        <a href="{{ url_for('home') }}" class="back-button">
+            Go back
+        </a>
     </div>
 
 
