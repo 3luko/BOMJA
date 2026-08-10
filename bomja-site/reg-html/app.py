@@ -78,7 +78,11 @@ def dashboard():
         print("No admin session", flush=True)
         return redirect(url_for("home"))
 
-    return render_template("dashboard.html")
+    events_file = BASE_DIR / "static" / "data" / "events.json"
+    with open(events_file, "r", encoding="utf-8") as file:
+        events = json.load(file)
+
+    return render_template("dashboard.html", events=events)
 
 
 #ROute for image upload
@@ -115,6 +119,31 @@ def add_image_to_json(filename, alt_text):
         "image": filename,
         "alt": alt_text
     })
+
+    # Write the updated list back to the JSON file
+    with open(JSON_FILE, "w") as file:
+        json.dump(images, file, indent=4)
+
+
+@app.route("/admin/delete/<filename>", methods=["POST"])
+def delete_image(filename):
+    # Remove the image from the JSON file
+    remove_image_from_json(filename)
+
+    # Remove the actual image file
+    image_path = UPLOAD_FOLDER / filename
+    if image_path.exists():
+        image_path.unlink()
+
+    return redirect(url_for("dashboard"))   
+
+def remove_image_from_json(filename):
+    # Open the existing JSON file
+    with open(JSON_FILE, "r") as file:
+        images = json.load(file)
+
+    # Remove the image with the specified filename
+    images = [img for img in images if img["image"] != filename]
 
     # Write the updated list back to the JSON file
     with open(JSON_FILE, "w") as file:
