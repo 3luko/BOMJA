@@ -76,11 +76,23 @@
         Upcoming Events
     </div>
 
+
     <div class="upcoming-events">
+
+        {% for event in events %}
+
+            <div class="event">
+
+                <img
+                    src="{{ url_for('static', filename='uploads/' + event['image']) }}"
+                    alt="{{ event['alt'] }}"
+                >
+
+            </div>
+
+        {% endfor %}
+
     </div>
-
-
-
 </section>
 
     <main>
