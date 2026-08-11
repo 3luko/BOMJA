@@ -1,30 +1,28 @@
 from flask import Flask, render_template, request, redirect, session, url_for
-from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-import json
+import sqlite3
 
 
 #SETUP
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
+DATABASE = BASE_DIR / "static" / "data" / "bomja.db"
 load_dotenv(ENV_PATH, override=True)
 
 
 
 UPLOAD_FOLDER = BASE_DIR / "static" / "uploads"
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
-JSON_FILE = BASE_DIR / "static" / "data" / "events.json"
+
 
 #Creating Flask app and Bcrypt instance
-app = Flask(__name__)
-# Enable Bcrypt
-bcrypt = Bcrypt(app)
+app = Flask(__name__, template_folder="templates", static_folder="static")
 
 #Env variables
 app.secret_key = os.getenv("SECRET_KEY")
-MYPASS = os.getenv("ADMIN_PASSWORD_HASH")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD_HASH")
 
 
 print("http://127.0.0.1:5000")
@@ -35,8 +33,15 @@ print("http://127.0.0.1:5000")
 #Route for home page
 @app.route("/")
 def home():
-    print("Login page opened", flush=True)
-    return render_template("bomja1.html")
+    print("Home page opened", flush=True)
+
+    connection = get_db_connection()
+
+    # Get all events from database
+    events = connection.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
+
+    return render_template("bomja1.html",
+                           events=events)
 
 
 
@@ -53,11 +58,11 @@ def login():
             return "Password is required", 400
 
         # Check the password
-        if MYPASS == password:
+        if ADMIN_PASSWORD and password == ADMIN_PASSWORD:
             print("Correct password", flush=True)
 
             session.clear()
-            session["admin"] = True        
+            session["admin"] = True
 
             return redirect(url_for("dashboard"))
 
@@ -78,9 +83,9 @@ def dashboard():
         print("No admin session", flush=True)
         return redirect(url_for("home"))
 
-    events_file = BASE_DIR / "static" / "data" / "events.json"
-    with open(events_file, "r", encoding="utf-8") as file:
-        events = json.load(file)
+    connection = get_db_connection()
+    events = connection.execute("SELECT * FROM events").fetchall()
+    connection.close()
 
     return render_template("dashboard.html", events=events)
 
@@ -89,66 +94,25 @@ def dashboard():
 @app.route("/admin/upload", methods=["POST"])
 def upload_image():
 
-    # Get the uploaded file
     file = request.files["image"]
+    filename = file.filename
 
-    # Get the alt text from the form
-    alt_text = request.form["alt"]
+    # Save the file to the uploads folder
+    file.save(UPLOAD_FOLDER / filename)
 
-    # Save the actual image
-    file.save(UPLOAD_FOLDER / file.filename)
+    add_event(filename, request.form["alt"])
 
-    # Add image information to JSON
-    add_image_to_json(
-        file.filename,
-        alt_text
-    )
 
     return redirect(url_for("dashboard"))
 
 
 
-#FUNCTION for adding image information to JSON
-def add_image_to_json(filename, alt_text):
-    # Open the existing JSON file
-    with open(JSON_FILE, "r") as file:
-        images = json.load(file)
-
-    # Add the new image to the list
-    images.append({
-        "image": filename,
-        "alt": alt_text
-    })
-
-    # Write the updated list back to the JSON file
-    with open(JSON_FILE, "w") as file:
-        json.dump(images, file, indent=4)
-
-
 @app.route("/admin/delete/<filename>", methods=["POST"])
 def delete_image(filename):
-    # Remove the image from the JSON file
-    remove_image_from_json(filename)
 
-    # Remove the actual image file
-    image_path = UPLOAD_FOLDER / filename
-    if image_path.exists():
-        image_path.unlink()
+    remove_event(filename)
 
-    return redirect(url_for("dashboard"))   
-
-def remove_image_from_json(filename):
-    # Open the existing JSON file
-    with open(JSON_FILE, "r") as file:
-        images = json.load(file)
-
-    # Remove the image with the specified filename
-    images = [img for img in images if img["image"] != filename]
-
-    # Write the updated list back to the JSON file
-    with open(JSON_FILE, "w") as file:
-        json.dump(images, file, indent=4)
-
+    return redirect(url_for("dashboard")) 
 
 #Route for logoout page
 @app.route("/logout")
@@ -156,8 +120,80 @@ def logout():
     session.clear()
     print("Admin logged out", flush=True)
 
-    return redirect("../bomja1.html")
+    return redirect(url_for("home"))  
+
+
+# Initialize the database if it doesn't exist
+def init_db():
+
+    connection = get_db_connection()
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS events (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            image TEXT NOT NULL,
+
+            alt TEXT NOT NULL
+
+        )
+    """)
+
+    connection.commit()
+
+    connection.close()
+
+# Database connection function
+def get_db_connection():
+
+    connection = sqlite3.connect(DATABASE)
+
+    connection.row_factory = sqlite3.Row
+
+    return connection
+
+
+# Function to add an event to the database
+def add_event(image, alt):
+
+    connection = get_db_connection()
+
+    existing = connection.execute(
+        "SELECT 1 FROM events WHERE image = ?",
+        (image,)
+    ).fetchone()
+
+    if not existing:
+        connection.execute(
+            """
+            INSERT INTO events (image, alt)
+            VALUES (?, ?)
+            """,
+            (image, alt)
+        )
+        connection.commit()
+
+    connection.close()
+
+# Function to remove an event from the database
+def remove_event(image):
+    connection = get_db_connection()
+
+    connection.execute(
+        """
+        DELETE FROM events
+        WHERE image = ?
+        """,
+        (image,)
+    )
+
+    connection.commit()
+
+    connection.close()
+
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
