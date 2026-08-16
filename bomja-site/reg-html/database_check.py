@@ -7,8 +7,8 @@ def check_database():
     try:
         rows = connection.execute(
             """
-                SELECT id, image, alt
-                FROM events
+                SELECT id, username, password
+                FROM pass
                 ORDER BY id
             """
         ).fetchall()
@@ -19,7 +19,7 @@ def check_database():
 
         print("Events in the database:")
         for row in rows:
-            print(f"id={row['id']} | image={row['image']} | alt={row['alt']}")
+            print(f"id={row['id']} | username={row['username']} | password={row['password']}")
 
         return rows
     finally:

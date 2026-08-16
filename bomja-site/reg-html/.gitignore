@@ -7,3 +7,12 @@ __pycache__/
 uploads/
 
 *.pyc
+
+passHash.py
+
+database_check.py
+
+passTABLE.py
+
+data/*.db
+

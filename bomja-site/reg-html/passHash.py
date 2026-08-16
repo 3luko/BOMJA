@@ -2,7 +2,7 @@ from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
 
-password = "bomja123"
+password = "bomja43!@"
 
 hash = bcrypt.generate_password_hash(password).decode("utf-8")
 
