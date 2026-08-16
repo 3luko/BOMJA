@@ -415,6 +415,8 @@
     max-width: 480px;
 
     box-shadow: 0 25px 50px rgba(0,0,0,.35);
+
+    cursor: pointer;
 }
 
 .tiktok-logo {

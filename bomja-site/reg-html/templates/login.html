@@ -13,6 +13,19 @@
 
         <form action="/login" method="POST" id="loginForm" novalidate>
             <input
+                type="hidden"
+                name="csrf_token"
+                value="{{csrf_token()}}"
+            >
+
+            <input
+                id="usernameInput"
+                type="text"
+                name="username"
+                placeholder="Enter Admin Username"
+                required
+            >
+            <input
                 id="passwordInput"
                 type="password"
                 name="password"
