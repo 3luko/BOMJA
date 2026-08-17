@@ -50,7 +50,7 @@ The website is built with Flask, SQLite, HTML, CSS, and JavaScript.
 ## Project Structure
 
 ```text
-BOMJA/
+BOMJA/reg-html
 │
 ├── app.py
 ├── requirements.txt
@@ -60,12 +60,14 @@ BOMJA/
 ├── templates/
 │   ├── bomja1.html
 │   ├── login.html
+│   ├── tickets.html
 │   └── dashboard.html
 │
 ├── static/
 │   ├── css/
 │   ├── js/
 │   └── uploads/
+│   └── visuals/
 │
 └── data/
     └── bomja.db
