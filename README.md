@@ -65,7 +65,6 @@ BOMJA/
 ├── static/
 │   ├── css/
 │   ├── js/
-│   ├── assets/
 │   └── uploads/
 │
 └── data/
@@ -112,7 +111,7 @@ Create a `.env` file in the root directory.
 ```env
 SECRET_KEY=your-secret-key
 ADMIN_USERNAME=your-admin-username
-ADMIN_PASSWORD_HASH=your-bcrypt-password-hash
+ADMIN_PASSWORD=your-bcrypt-password-hash
 FLASK_ENV=development
 ```
 
@@ -223,7 +222,7 @@ Production configuration should provide environment variables for:
 ```env
 SECRET_KEY=
 ADMIN_USERNAME=
-ADMIN_PASSWORD_HASH=
+ADMIN_PASSWORD=
 FLASK_ENV=production
 DATABASE_PATH=
 UPLOAD_FOLDER=
