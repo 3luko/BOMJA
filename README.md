@@ -50,7 +50,7 @@ The website is built with Flask, SQLite, HTML, CSS, and JavaScript.
 ## Project Structure
 
 ```text
-BOMJA/
+BOMJA/reg-html
 │
 ├── app.py
 ├── requirements.txt
@@ -60,13 +60,14 @@ BOMJA/
 ├── templates/
 │   ├── bomja1.html
 │   ├── login.html
+│   ├── tickets.html
 │   └── dashboard.html
 │
 ├── static/
 │   ├── css/
 │   ├── js/
-│   ├── assets/
 │   └── uploads/
+│   └── visuals/
 │
 └── data/
     └── bomja.db
@@ -112,7 +113,7 @@ Create a `.env` file in the root directory.
 ```env
 SECRET_KEY=your-secret-key
 ADMIN_USERNAME=your-admin-username
-ADMIN_PASSWORD_HASH=your-bcrypt-password-hash
+ADMIN_PASSWORD=your-bcrypt-password-hash
 FLASK_ENV=development
 ```
 
@@ -223,7 +224,7 @@ Production configuration should provide environment variables for:
 ```env
 SECRET_KEY=
 ADMIN_USERNAME=
-ADMIN_PASSWORD_HASH=
+ADMIN_PASSWORD=
 FLASK_ENV=production
 DATABASE_PATH=
 UPLOAD_FOLDER=
