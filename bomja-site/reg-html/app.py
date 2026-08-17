@@ -41,6 +41,7 @@ def init_db():
         )
     """)
 
+
     connection.commit()
     connection.close()
 
@@ -221,6 +222,19 @@ def dashboard():
     connection.close()
 
     return render_template("dashboard.html", events=events)
+
+
+# Route to get to the mailing list page (NOT READY)
+@app.route("/mail-list", methods=["GET", "POST"])
+def mail_list():
+    print("Mail List not yet ready.", flush=True)
+
+    return render_template("mail-list.html")
+
+# Route for the Tickets tab
+@app.route("/tickets")
+def ticket():
+    return render_template("tickets.html")
 
 
 #ROute for image upload

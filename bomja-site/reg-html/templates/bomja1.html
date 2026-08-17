@@ -31,7 +31,7 @@
                 <span></span>
             </button>
 
-            <a class="btn nav-ticket" href="https://your-ticket-link.com">
+            <a class="btn nav-ticket" href="{{ url_for('ticket') }}">
                 Tickets
             </a>
 
@@ -131,7 +131,7 @@
         </p>
 
         <p>
-            <a class="btn" href="https://your-ticket-link.com">
+            <a class="btn" href="{{ url_for('ticket') }}">
                 Buy Tickets
             </a>
 
@@ -152,7 +152,7 @@
                 Celebrations of who we are — and who we are together.
             </p>
 
-            <a class="btn" href="https://your-ticket-link.com">
+            <a class="btn" href="{{ url_for('ticket') }}">
                 Get Access
             </a>
         </div>
@@ -464,7 +464,12 @@
                 Mailing List
             </p>
 
-            <form action="#" method="post">
+            <form action="{{ url_for('mail_list') }}" method="post">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
                 <input
                     class="input"
                     name="name"
