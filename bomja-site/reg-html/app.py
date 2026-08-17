@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, abort
+from flask import Flask, send_from_directory, render_template, request, redirect, session, url_for, abort
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ import bcrypt
 import os
 import sqlite3
 import uuid
+
 
 
 # Database connection function
@@ -107,10 +108,15 @@ def allowed_file(filename):
 #Creating Flask app and Bcrypt instance
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Limit upload size to 16MB
+app.secret_key = os.getenv("SECRET_KEY")
+if not app.secret_key:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is required."
+    )
 
 csrf = CSRFProtect(app)
+
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Limit upload size to 16MB
 
 IS_PRODUCTION = os.getenv("FLASK_ENV") == "production"
 app.config.update(
@@ -119,7 +125,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax"
 )
 
-app.secret_key = os.getenv("SECRET_KEY")
+
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY environment variable is required")
 
@@ -246,6 +252,11 @@ def upload_image():
 
 
     return redirect(url_for("dashboard"))
+
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 #Route for image deletion
 @app.route("/admin/delete/<filename>", methods=["POST"])
