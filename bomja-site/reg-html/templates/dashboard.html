@@ -166,6 +166,7 @@
 
 
     <form
+        id="uploadForm"
         action="{{ url_for('upload_image') }}"
         method="POST"
         enctype="multipart/form-data"
@@ -187,8 +188,6 @@
             accept="image/png, image/jpeg, image/webp"
             required
 
-
-
         <br><br>
 
 
@@ -206,7 +205,18 @@
             required
         >
 
+        <br><br>
 
+        <label for="eventTickets">
+            Ticket Link
+        </label>
+
+        <input
+            type="url"
+            name="ticketLink"
+            id="ticketLink"
+            placeholder="Ticket Link"
+        >
 
         <br><br>
 
@@ -236,7 +246,7 @@
 </div>
 
 
-
+<script src="static\js\admin.js"></script>
 <script>
 
     function openAddEvent() {

@@ -1,19 +1,15 @@
-const eventImageInput = document.getElementById("eventImage");
-const eventImagePreview = document.getElementById("eventImagePreview");
+const form = document.getElementById("uploadForm");
+const ticketLink = document.getElementById("ticketLink");
 
-if (eventImageInput && eventImagePreview) {
-    eventImageInput.addEventListener("change", function () {
-        const file = this.files[0];
+form.addEventListener("submit", function(event){
 
-        if (!file) {
-            eventImagePreview.src = "";
-            eventImagePreview.style.display = "none";
-            return;
+    if (!ticketLink.value.trim()){
+        const continueWithoutLink = confirm(
+            "No ticket link was added. Do you want to upload this event anyway?"
+        );
+
+        if (!continueWithoutLink){
+            event.preventDefault();
         }
-
-        const imageURL = URL.createObjectURL(file);
-
-        eventImagePreview.src = imageURL;
-        eventImagePreview.style.display = "block";
-    });
-}
+    }
+})

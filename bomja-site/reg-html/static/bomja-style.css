@@ -183,6 +183,31 @@
     margin: 0 auto !important;
 }
 
+.upcoming-events {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.event {
+    width: 40%;
+    flex-shrink: 0;
+}
+
+.event-link {
+    display: block;
+    width: 100%;
+}
+
+.event-link img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 @media (max-width: 850px) {
     .socials-grid {
         grid-template-columns: 1fr;
@@ -208,13 +233,6 @@
         margin:36px auto 24px
     }
     
-    .event{
-        position:relative;
-        background:rgba(0,0,0,.35);
-        border-radius:26px;
-        padding:24px;
-        margin-top:20px
-    }
     
     .event h2{
         font-size:36px;
@@ -677,22 +695,6 @@
     font-size: 11px;
 }
 
-
-.upcoming-events img {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-}
-
-.upcoming-events {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-}
-
 /* ==============================
    MOBILE-READY ENHANCEMENTS
    ============================== */
@@ -878,25 +880,41 @@ video {
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: min(82vw, 360px);
+
         overflow-x: auto;
         gap: 16px;
-        justify-content: start;
+
         scroll-snap-type: x mandatory;
-        overscroll-behavior-inline: contain;
-        padding: 2px 2px 16px;
+
+        padding: 2px 16px 16px;
+
         scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
 
     .upcoming-events::-webkit-scrollbar {
         display: none;
     }
 
-    .upcoming-events img {
+    .event {
         width: 100%;
-        max-width: none;
-        margin: 0;
-        scroll-snap-align: center;
+        min-width: 0;
+        scroll-snap-align: start;
     }
+
+    .event-link {
+        display: block;
+        width: 100%;
+    }
+
+    .event-link img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        margin: 0;
+    }
+ 
 
     .hero {
         padding: 48px 16px 38px;
@@ -981,6 +999,29 @@ video {
         width: 100%;
         min-height: 50px;
     }
+}
+
+@media (max-width: 600px) {
+
+    .upcoming-events {
+        grid-auto-columns: 82vw;
+        gap: 12px;
+        padding-left: 16px;
+        padding-right: 16px;
+        scroll-padding-left: 16px;
+    }
+
+}
+
+@media (max-width: 400px) {
+
+    .upcoming-events {
+        grid-auto-columns: 86vw;
+        gap: 10px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
 }
 
 @media (max-width: 480px) {

@@ -72,27 +72,41 @@
 </section>
 
 <section class="events" id="events">
+    <!-- EVENTS SECTION -->
     <div class="section-title">
         Upcoming Events
     </div>
 
 
-    <div class="upcoming-events">
+<div class="upcoming-events">
 
-        {% for event in events %}
 
-            <div class="event">
+    {% for event in events %}
+
+        <div class="event">
+
+            <a
+                class="event-link"
+
+                {% if event["event_ticket_link"] %}
+                    href="{{ event['event_ticket_link'] }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                {% endif %}
+            >
 
                 <img
                     src="{{ url_for('uploaded_file', filename=event['image']) }}"
                     alt="{{ event['alt'] }}"
                 >
 
-            </div>
+            </a>
 
-        {% endfor %}
+        </div>
 
-    </div>
+    {% endfor %}
+
+</div>
 </section>
 
     <main>

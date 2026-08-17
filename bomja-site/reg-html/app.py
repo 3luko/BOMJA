@@ -28,6 +28,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             image TEXT NOT NULL,
+            event_ticket_link TEXT,
             alt TEXT NOT NULL
         )
     """)
@@ -248,7 +249,15 @@ def upload_image():
     # Save the file to the uploads folder
     file.save(UPLOAD_FOLDER / filename)
 
-    add_event(filename, request.form["alt"])
+    ticket_link = request.form.get("ticketLink", "").strip()
+    if ticket_link and not ticket_link.startswith(("http://", "https://")):
+        return "Ticket link must start with http:// or https://", 400
+
+    add_event(
+        filename, 
+        request.form["alt"], 
+        ticket_link
+    )
 
 
     return redirect(url_for("dashboard"))
@@ -280,7 +289,7 @@ def logout():
 
 
 # Function to add an event to the database
-def add_event(image, alt):
+def add_event(image, alt, event_ticket_link):
 
     connection = get_db_connection()
 
@@ -289,13 +298,15 @@ def add_event(image, alt):
         (image,)
     ).fetchone()
 
+    
+
     if not existing:
         connection.execute(
             """
-            INSERT INTO events (image, alt)
-            VALUES (?, ?)
+            INSERT INTO events (image, alt, event_ticket_link)
+            VALUES (?, ?, ?)
             """,
-            (image, alt)
+            (image, alt, event_ticket_link)
         )
         connection.commit()
 
