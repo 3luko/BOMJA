@@ -41,6 +41,15 @@ def init_db():
         )
     """)
 
+    connection.execute("""
+        CREATE TABLE if NOT EXISTS mailing_list (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """);
+
 
     connection.commit()
     connection.close()
@@ -225,11 +234,29 @@ def dashboard():
 
 
 # Route to get to the mailing list page (NOT READY)
-@app.route("/mail-list", methods=["GET", "POST"])
+@app.route("/mail-list", methods=["POST"])
 def mail_list():
-    print("Mail List not yet ready.", flush=True)
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
 
-    return render_template("mail-list.html")
+        conn = get_db_connection()
+
+        try:
+            conn.execute(
+                "INSERT INTO mailing_list (name, email) VALUES (?, ?)",
+                (name, email)
+            )
+            conn.commit()
+        except sqlite3.IntegrityError:
+            print("Email already exists")
+
+        finally:
+            conn.close()
+
+    return redirect(url_for("home"))
+
+
 
 # Route for the Tickets tab
 @app.route("/tickets")
