@@ -81,3 +81,23 @@ if (menuToggle && mobileMenu) {
         });
     });
 }
+
+// Event carousel navigation
+const eventScrollButtons = document.querySelectorAll('.event-scroll-btn');
+const eventsTrack = document.querySelector('.upcoming-events');
+
+if (eventsTrack && eventScrollButtons.length > 0) {
+    eventScrollButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const eventCard = eventsTrack.querySelector('.event');
+            const gap = 24;
+            const cardWidth = eventCard ? eventCard.getBoundingClientRect().width + gap : eventsTrack.clientWidth * 0.82;
+            const direction = button.classList.contains('event-scroll-prev') ? -1 : 1;
+
+            eventsTrack.scrollBy({
+                left: cardWidth * direction,
+                behavior: 'smooth'
+            });
+        });
+    });
+}

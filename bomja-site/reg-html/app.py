@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, render_template, request, redirect, session, url_for, abort
+from flask import Flask, flash, send_from_directory, render_template, request, redirect, session, url_for, abort
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ import bcrypt
 import os
 import sqlite3
 import uuid
+import requests
 
 
 
@@ -48,8 +49,16 @@ def init_db():
             email TEXT NOT NULL UNIQUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """);
+    """)
 
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS gallery_images (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image TEXT NOT NULL,
+            alt TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
 
     connection.commit()
     connection.close()
@@ -107,7 +116,26 @@ UPLOAD_FOLDER = Path(
         BASE_DIR / "static" / "uploads"
     )
 )
+
+EVENTS_FOLDER = Path(
+    os.getenv(
+        "EVENTS_FOLDER",
+        BASE_DIR / "static" / "uploads" / "events"
+    )
+)
+
+GALLERY_FOLDER = Path(
+    os.getenv(
+        "GALLERY_FOLDER",
+        BASE_DIR / "static" / "uploads" / "gallery"
+    )
+)
+
+
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+EVENTS_FOLDER.mkdir(parents=True, exist_ok=True)
+GALLERY_FOLDER.mkdir(parents=True, exist_ok=True)
+
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 def allowed_file(filename):
@@ -227,32 +255,95 @@ def dashboard():
         return redirect(url_for("home"))
 
     connection = get_db_connection()
-    events = connection.execute("SELECT * FROM events").fetchall()
+    events = connection.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
+    past_events = connection.execute("SELECT * FROM past_events ORDER BY id DESC").fetchall()
+    gallery_images = connection.execute("SELECT * FROM gallery_images ORDER BY id DESC").fetchall()
+    mailing_list = connection.execute(
+        "SELECT id, name, email, created_at FROM mailing_list ORDER BY id DESC"
+    ).fetchall()
     connection.close()
 
-    return render_template("dashboard.html", events=events)
+    return render_template(
+        "dashboard.html",
+        events=events,
+        past_events=past_events,
+        gallery_images=gallery_images,
+        mailing_list=mailing_list,
+    )
 
 
 # Route to get to the mailing list page (NOT READY)
 @app.route("/mail-list", methods=["POST"])
 def mail_list():
-    if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
 
-        conn = get_db_connection()
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip().lower()
 
-        try:
-            conn.execute(
-                "INSERT INTO mailing_list (name, email) VALUES (?, ?)",
-                (name, email)
+
+    #Mailchimp Config
+    api_key = os.getenv("MAILCHIMP_API_KEY")
+    audience_id = os.getenv("MAILCHIMP_AUDIENCE_ID")
+    server_prefix = os.getenv("MAILCHIMP_SERVER_PREFIX")
+
+    # Mailchimp url
+    url = f"https://{server_prefix}.api.mailchimp.com/3.0/lists/{audience_id}/members/"
+
+    data = {
+        "email_address": email,
+        "status": "subscribed",
+        "merge_fields": {
+            "FNAME": name
+        }
+    }
+
+    try:
+        response = requests.post(
+            url,
+            auth=("anystring", api_key),
+            json=data
+        )
+
+        if response.status_code == 200:
+            print("Successfully subscribed!")
+            flash("Thanks for joining the BOMJA list!", "success")
+        elif response.status_code == 400:
+            flash("You're already on the BOMJA list!", "info")
+            error = response.json()
+            print(
+                "Mailchimp rejected subscriber",
+                error.get("title"),
+                error.get("detail"),
+                flush=True
             )
-            conn.commit()
-        except sqlite3.IntegrityError:
-            print("Email already exists")
+        else:
+            print(
+                "Mailchimp error:",
+                response.status_code,
+                response.text,
+                flush=True
+            )
+            flash("Something went wrong. Please try again.", "error")
 
-        finally:
-            conn.close()
+    except requests.RequestException as e:
+        print("Mailchimp connection error:", e, flush=True)
+        flash("Something went wrong. Please try again.", "error")
+
+
+
+
+    conn = get_db_connection()
+
+    try:
+        conn.execute(
+            "INSERT INTO mailing_list (name, email) VALUES (?, ?)",
+            (name, email)
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        print("Email already exists")
+
+    finally:
+        conn.close()
 
     return redirect(url_for("home"))
 

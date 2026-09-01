@@ -23,6 +23,7 @@
                 <a href="#events">Events</a>
                 <a href="#about">About</a>
                 <a href="#socials">Socials</a>
+                <!-- <a href="#gallery">Gallery</a> -->
                 <a href="#list">Email List</a>
             </div>
 
@@ -35,16 +36,13 @@
             <a class="btn nav-ticket" href="{{ url_for('ticket') }}">
                 Tickets
             </a>
-
-            <a class="btn admin-btn" href="{{ url_for('login') }}">
-                Admin
-            </a>
         </nav>
 
         <div class="mobile-menu" id="mobile-menu">
             <a href="#events">Events</a>
             <a href="#about">About</a>
             <a href="#socials">Socials</a>
+            <!-- <a href="#gallery">Gallery</a> -->
             <a href="#list">Email List</a>
             <a class="btn" href="https://your-ticket-link.com">Tickets</a>
         </div>
@@ -78,36 +76,43 @@
         Upcoming Events
     </div>
 
+    <div class="events-controls" aria-label="Event navigation controls">
+        <button class="event-scroll-btn event-scroll-prev" type="button" aria-label="Previous event">
+            <span aria-hidden="true">&#8249;</span>
+        </button>
+        <button class="event-scroll-btn event-scroll-next" type="button" aria-label="Next event">
+            <span aria-hidden="true">&#8250;</span>
+        </button>
+    </div>
 
-<div class="upcoming-events">
+    <div class="upcoming-events" id="upcoming-events">
 
+        {% for event in events %}
 
-    {% for event in events %}
+            <div class="event">
 
-        <div class="event">
+                <a
+                    class="event-link"
 
-            <a
-                class="event-link"
-
-                {% if event["event_ticket_link"] %}
-                    href="{{ event['event_ticket_link'] }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                {% endif %}
-            >
-
-                <img
-                    src="{{ url_for('uploaded_file', filename=event['image']) }}"
-                    alt="{{ event['alt'] }}"
+                    {% if event["event_ticket_link"] %}
+                        href="{{ event['event_ticket_link'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    {% endif %}
                 >
 
-            </a>
+                    <img
+                        src="{{ url_for('uploaded_file', filename=event['image']) }}"
+                        alt="{{ event['alt'] }}"
+                    >
 
-        </div>
+                </a>
 
-    {% endfor %}
+            </div>
 
-</div>
+        {% endfor %}
+
+    </div>
 </section>
 
     <main>
@@ -153,7 +158,7 @@
                 Celebrations of who we are — and who we are together.
             </p>
 
-            <a class="btn" href="{{ url_for('ticket') }}">
+            <a class="btn" href="https://linktr.ee/bomja?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAcGRvZgJleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAac6331DnS-VMpZp-ChK1-P46oWhYBzeVTqMYaWlmAJZQw0vWiWiERGP4wP8HQ_aem_MSE-sSSs678j71U3RAZjPA" target="_blank" rel="noopener norefferer">
                 Get Access
             </a>
         </div>
@@ -453,6 +458,49 @@
 
 </section>
 
+        <!-- <section id="gallery">
+            <div class="section-header">
+                <h2 class="section-title">
+                    Past Events Gallery
+                </h2>
+
+                <a
+                    class="gallery-link"
+                    href="https://www.dropbox.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    View full archive
+                </a>
+            </div>
+
+            <div class="gallery-grid" aria-label="Gallery of past BOMJA events">
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA001-21.png" alt="BOMJA event crowd">
+                </figure>
+
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA002-93.png" alt="People enjoying a BOMJA performance">
+                </figure>
+
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA001-40.png" alt="BOMJA event atmosphere">
+                </figure>
+
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA001-43.png" alt="Backstage or stage moment from BOMJA">
+                </figure>
+
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA001-21.png" alt="Another moment from a past BOMJA event">
+                </figure>
+
+                <figure class="gallery-card">
+                    <img src="static\visuals\BOMJA001-43.png" alt="Community gathering at BOMJA">
+                </figure>
+            </div>
+        </section> -->
+
         <!-- Email List -->
         <section id="list">
             <h2 class="section-title">
@@ -462,8 +510,18 @@
             <p style="color: var(--muted)">
                 <!-- Replace this form action with Mailchimp, Klaviyo,
                 Formspree, or your own backend. -->
-                Mailing List
+                Stay up to date with BOMJA events and announcements
             </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %} 
+                {% if messages %} 
+                    {% for category, message in messages %} 
+                        <div class="flash-message {{ category }}">
+                             {{ message }} 
+                        </div> 
+                    {% endfor %} 
+                {% endif %} 
+            {% endwith %}
 
             <form action="{{ url_for('mail_list') }}" method="post">
                 <input
@@ -495,8 +553,10 @@
     </main>
 
     <footer>
-        © BOMJA .
-        
+        <div>© BOMJA .</div>
+        <a class="btn admin-btn" href="{{ url_for('login') }}">
+            Admin
+        </a>
     </footer>
     <script async src="https://www.instagram.com/embed.js"></script>
     <script src="static\js\bomja.js"></script>
