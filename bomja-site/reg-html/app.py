@@ -256,7 +256,6 @@ def dashboard():
 
     connection = get_db_connection()
     events = connection.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
-    past_events = connection.execute("SELECT * FROM past_events ORDER BY id DESC").fetchall()
     gallery_images = connection.execute("SELECT * FROM gallery_images ORDER BY id DESC").fetchall()
     mailing_list = connection.execute(
         "SELECT id, name, email, created_at FROM mailing_list ORDER BY id DESC"
