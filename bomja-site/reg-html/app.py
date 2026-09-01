@@ -264,8 +264,7 @@ def dashboard():
 
     return render_template(
         "dashboard.html",
-        events=events,
-        past_events=past_events,
+        events=events
         gallery_images=gallery_images,
         mailing_list=mailing_list,
     )
