@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event["alt"] }} | BOMJA Gallery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bomja-style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a class="brand" href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='visuals/logos/unnamed (2).png') }}" alt="BOMJA logo">
+                BOMJA
+            </a>
+            <a class="btn secondary" href="{{ url_for('home') }}#gallery">Back to Gallery</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="event-gallery-page" id="gallery">
+            <a class="gallery-back-link" href="{{ url_for('home') }}#gallery">&larr; All past events</a>
+            <h1 class="section-title">{{ event["alt"] }}</h1>
+
+            <div class="gallery-grid" aria-label="Photos from {{ event['alt'] }}">
+                {% for photo in photos %}
+                <figure class="gallery-card">
+                    <img
+                        src="{{ url_for('static', filename='uploads/gallery/' + photo['filename']) }}"
+                        alt="{{ photo['alt_text'] or event['alt'] }}"
+                    >
+                </figure>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -82,22 +82,32 @@ if (menuToggle && mobileMenu) {
     });
 }
 
-// Event carousel navigation
-const eventScrollButtons = document.querySelectorAll('.event-scroll-btn');
-const eventsTrack = document.querySelector('.upcoming-events');
+// Keep each carousel's controls connected to its own track.
+function setupCarousel(trackSelector, buttonSelector) {
+    const track = document.querySelector(trackSelector);
+    const buttons = document.querySelectorAll(buttonSelector);
 
-if (eventsTrack && eventScrollButtons.length > 0) {
-    eventScrollButtons.forEach((button) => {
+    if (!track || buttons.length === 0) {
+        return;
+    }
+
+    buttons.forEach((button) => {
         button.addEventListener('click', () => {
-            const eventCard = eventsTrack.querySelector('.event');
+            const eventCard = track.querySelector('.event');
             const gap = 24;
-            const cardWidth = eventCard ? eventCard.getBoundingClientRect().width + gap : eventsTrack.clientWidth * 0.82;
-            const direction = button.classList.contains('event-scroll-prev') ? -1 : 1;
+            const cardWidth = eventCard
+                ? eventCard.getBoundingClientRect().width + gap
+                : track.clientWidth * 0.82;
+            const direction = button.classList.contains('event-scroll-prev')
+                || button.classList.contains('gallery-scroll-prev') ? -1 : 1;
 
-            eventsTrack.scrollBy({
+            track.scrollBy({
                 left: cardWidth * direction,
                 behavior: 'smooth'
             });
         });
     });
 }
+
+setupCarousel('.event-track', '.event-controls .event-scroll-btn');
+setupCarousel('.gallery-event-track', '.gallery-controls .event-scroll-btn');

@@ -17,7 +17,7 @@
         <div class="card events-card">
             <div class="section-header">
                 <div>
-                    <h2>Upcoming Events</h2>
+                    <h2>Events</h2>
                     <p>Manage the events currently displayed on the website.</p>
                 </div>
                 <button type="button" class="add-event-btn" onclick="openAddEvent()">+ Add Event</button>
@@ -30,6 +30,15 @@
                         <h3>{{ event["alt"] }}</h3>
                         <p>{{ event["image"] }}</p>
                     </div>
+
+                    <form action="{{ url_for('update_event_visibility', event_id=event['id']) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <label for="visibility-{{ event['id'] }}">Display flyer</label>
+                        <select id="visibility-{{ event['id'] }}" name="is_visible" onchange="this.form.submit()">
+                            <option value="1" {% if event['is_visible'] %}selected{% endif %}>Upcoming (shown)</option>
+                            <option value="0" {% if not event['is_visible'] %}selected{% endif %}>Past (Gallery)</option>
+                        </select>
+                    </form>
 
                     <form action="{{ url_for('delete_image', filename=event['image']) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this event?');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -44,99 +53,6 @@
             <div class="no-events">
                 <h3>No Upcoming Events</h3>
                 <p>Add an event to display it here.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="card">
-            <div class="section-header">
-                <div>
-                    <h2>Past Events</h2>
-                    <p>Archive of previous BOMJA events.</p>
-                </div>
-            </div>
-
-            {% if past_events %}
-            <div class="admin-list">
-                {% for item in past_events %}
-                <div class="event-item">
-                    <div class="event-info">
-                        <h3>{{ item["alt"] }}</h3>
-                        <p>{{ item["image"] }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-events">
-                <h3>No Past Events</h3>
-                <p>There are no archived events yet.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="card">
-            <div class="section-header">
-                <div>
-                    <h2>Gallery Images</h2>
-                    <p>Images saved for the site gallery.</p>
-                </div>
-            </div>
-
-            {% if gallery_images %}
-            <div class="admin-list">
-                {% for item in gallery_images %}
-                <div class="event-item">
-                    <div class="event-info">
-                        <h3>{{ item["alt"] }}</h3>
-                        <p>{{ item["image"] }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="no-events">
-                <h3>No Gallery Images</h3>
-                <p>Add images to build the gallery.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="card">
-            <div class="section-header">
-                <div>
-                    <h2>Mailing List Subscribers</h2>
-                    <p>All people currently signed up to receive updates.</p>
-                </div>
-            </div>
-
-            {% if mailing_list %}
-            <div class="table-wrap">
-                <table class="mailing-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Joined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for person in mailing_list %}
-                        <tr>
-                            <td>{{ person["id"] }}</td>
-                            <td>{{ person["name"] }}</td>
-                            <td>{{ person["email"] }}</td>
-                            <td>{{ person["created_at"] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="no-events">
-                <h3>No Mailing List Entries</h3>
-                <p>No one has signed up yet.</p>
             </div>
             {% endif %}
         </div>
@@ -169,6 +85,160 @@
                 </div>
             </form>
         </div>
+
+        <div class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Gallery Images</h2>
+                    <p>Images saved for the site gallery.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="add-event-btn"
+                    onclick="openAddGalleryImage()">
+                    + Add Gallery Images
+                </button>
+            </div>
+
+             {% if gallery_by_event %}
+
+        {% for event_id, photos in gallery_by_event.items() %}
+
+            <div class="gallery-event">
+
+                <div class="gallery-event-header">
+                    <h3>{{ photos[0]["event_name"] }}</h3>
+                    <p>{{ photos|length }} photo(s)</p>
+                </div>
+
+
+                <div class="gallery-grid">
+
+                    {% for item in photos %}
+
+                        <div class="gallery-card">
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='uploads/gallery/' + item['filename']
+                                ) }}"
+                                alt="{{ item['alt_text'] }}"
+                                class="gallery-admin-image"
+                            >
+
+                            <div class="gallery-card-info">
+                                <p>{{ item["alt_text"] }}</p>
+
+                                <form
+                                    action="{{ url_for(
+                                        'delete_gallery_image',
+                                        filename=item['filename']
+                                    ) }}"
+                                    method="POST"
+                                    onsubmit="return confirm(
+                                        'Are you sure you want to remove this image?'
+                                    );"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="remove-event-btn"
+                                    >
+                                        Remove
+                                    </button>
+
+                                </form>
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+            </div>
+            {% else %}
+            <div class="no-events">
+                <h3>No Gallery Images</h3>
+                <p>Add images to build the gallery.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card add-event-panel" id="addGalleryImagePanel" style="display: none;">
+            <h2>Add Gallery Images</h2>
+            <p>Upload photos from a past event to add them to the gallery.</p>
+
+            <form id="galleryForm"
+
+                action="{{ url_for('upload_gallery')}}"
+                method="POST"
+                enctype="multipart/form-data">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <label for="galleryEvent">Event</label>
+                <select name="event_id" id="galleryEvent" required>
+                    <option value="" disabled selected>Select an event</option>
+
+                    {% for event in events %}
+                        <option value="{{ event['id'] }}">
+                            {{ event['alt'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <br><br>
+
+                <label for="galleryImages">Gallery Images</label>
+                <input
+                    type="file"
+                    name="images"
+                    id="galleryImages"
+                    accept="image/png, image/jpeg, image/webp"
+                    multiple
+                    required
+                >
+
+                <br><br>
+
+                <label for="galleryAlt">Alt Text</label>
+                <input
+                    type="text"
+                    name="alt"
+                    id="galleryAlt"
+                    placeholder="Describe the gallery images"
+                    required
+                >
+
+                <br><br>
+
+                <div class="form-buttons">
+                    <button type="submit" class="save-event-btn">
+                        Add Images
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        onclick="closeAddGalleryImage()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="static\js\admin.js"></script>
@@ -179,6 +249,15 @@
 
         function closeAddEvent() {
             document.getElementById("addEventPanel").style.display = "none";
+        }
+
+        // Functions for the Gallery Image Section form
+        function openAddGalleryImage(){
+            document.getElementById("addGalleryImagePanel").style.display = "block";
+        }
+
+        function closeAddGalleryImage(){
+            document.getElementById("addGalleryImagePanel").style.display = "none";
         }
     </script>
 </body>

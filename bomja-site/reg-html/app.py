@@ -8,6 +8,7 @@ import os
 import sqlite3
 import uuid
 import requests
+from collections import defaultdict
 
 
 
@@ -18,22 +19,30 @@ def get_db_connection():
 
     connection.row_factory = sqlite3.Row
 
+    connection.execute("PRAGMA foreign_keys = ON")
+
     return connection
 
 # Initialize the database if it doesn't exist
 def init_db():
 
     connection = get_db_connection()
-
+    # events table (event flyers)
     connection.execute("""
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             image TEXT NOT NULL,
             event_ticket_link TEXT,
-            alt TEXT NOT NULL
+            alt TEXT NOT NULL,
+            is_visible INTEGER NOT NULL DEFAULT 1
         )
     """)
-
+    event_columns = connection.execute("PRAGMA table_info(events)").fetchall()
+    if not any(column[1] == "is_visible" for column in event_columns):
+        connection.execute(
+            "ALTER TABLE events ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1"
+        )
+    # Password table
     connection.execute("""
         CREATE TABLE if NOT EXISTS pass (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,22 +52,24 @@ def init_db():
     """)
 
     connection.execute("""
-        CREATE TABLE if NOT EXISTS mailing_list (
+        CREATE TABLE IF NOT EXISTS gallery_photos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            event_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            alt_text TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (event_id) REFERENCES events(id)
         )
     """)
 
-    connection.execute("""
-        CREATE TABLE IF NOT EXISTS gallery_images (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            image TEXT NOT NULL,
-            alt TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+    # connection.execute("""
+    #     CREATE TABLE IF NOT EXISTS slideshow_photos (
+    #         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #         filename TEXT NOT NULL,
+    #         alt_text TEXT,
+    #         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    #     )
+    # """)
 
     connection.commit()
     connection.close()
@@ -132,7 +143,6 @@ GALLERY_FOLDER = Path(
 )
 
 
-UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 EVENTS_FOLDER.mkdir(parents=True, exist_ok=True)
 GALLERY_FOLDER.mkdir(parents=True, exist_ok=True)
 
@@ -181,12 +191,56 @@ def home():
 
     connection = get_db_connection()
 
-    # Get all events from database
-    events = connection.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
+    # Get currently visible upcoming events.
+    events = connection.execute(
+        "SELECT * FROM events WHERE is_visible = 1 ORDER BY id DESC"
+    ).fetchall()
+
+    # Show past event flyers only when the event has gallery photos.
+    gallery_events = connection.execute("""
+        SELECT events.*
+        FROM events
+        WHERE events.is_visible = 0
+          AND EXISTS (
+              SELECT 1
+              FROM gallery_photos
+              WHERE gallery_photos.event_id = events.id
+          )
+        ORDER BY events.id DESC
+    """).fetchall()
+
     connection.close()
 
     return render_template("bomja1.html",
-                           events=events)
+                           events=events,
+                           gallery_events=gallery_events)
+
+
+@app.route("/gallery/<int:event_id>")
+def event_gallery(event_id):
+    connection = get_db_connection()
+    event = connection.execute("""
+        SELECT *
+        FROM events
+        WHERE id = ? AND is_visible = 0
+    """, (event_id,)).fetchone()
+
+    if not event:
+        connection.close()
+        abort(404)
+
+    photos = connection.execute("""
+        SELECT filename, alt_text
+        FROM gallery_photos
+        WHERE event_id = ?
+        ORDER BY created_at ASC, id ASC
+    """, (event_id,)).fetchall()
+    connection.close()
+
+    if not photos:
+        abort(404)
+
+    return render_template("event_gallery.html", event=event, photos=photos)
 
 
 # Route for logging in.
@@ -256,17 +310,30 @@ def dashboard():
 
     connection = get_db_connection()
     events = connection.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
-    gallery_images = connection.execute("SELECT * FROM gallery_images ORDER BY id DESC").fetchall()
-    mailing_list = connection.execute(
-        "SELECT id, name, email, created_at FROM mailing_list ORDER BY id DESC"
-    ).fetchall()
+    gallery_photos = connection.execute("""
+    SELECT
+        gallery_photos.id,
+        gallery_photos.event_id,
+        gallery_photos.filename,
+        gallery_photos.alt_text,
+        events.alt AS event_name
+    FROM gallery_photos
+    JOIN events
+        ON gallery_photos.event_id = events.id
+    ORDER BY events.id DESC
+""").fetchall()
+
+    gallery_by_event = defaultdict(list)
+
+    for photo in gallery_photos:
+        gallery_by_event[photo["event_id"]].append(photo)
+
     connection.close()
 
     return render_template(
         "dashboard.html",
         events=events,
-        gallery_images=gallery_images,
-        mailing_list=mailing_list
+        gallery_by_event=gallery_by_event
     )
 
 
@@ -326,23 +393,6 @@ def mail_list():
         print("Mailchimp connection error:", e, flush=True)
         flash("Something went wrong. Please try again.", "error")
 
-
-
-
-    conn = get_db_connection()
-
-    try:
-        conn.execute(
-            "INSERT INTO mailing_list (name, email) VALUES (?, ?)",
-            (name, email)
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
-        print("Email already exists")
-
-    finally:
-        conn.close()
-
     return redirect(url_for("home"))
 
 
@@ -353,8 +403,7 @@ def ticket():
     return render_template("tickets.html")
 
 
-#ROute for image upload
-
+#ROute for Event upload
 @app.route("/admin/upload", methods=["POST"])
 def upload_image():
     if not session.get("admin"):
@@ -376,8 +425,8 @@ def upload_image():
     #Preventing 2 uploads from having the same filename
     filename = f"{uuid.uuid4().hex}_{filename}"
     
-    # Save the file to the uploads folder
-    file.save(UPLOAD_FOLDER / filename)
+    # Save the file to the events folder
+    file.save(EVENTS_FOLDER / filename)
 
     ticket_link = request.form.get("ticketLink", "").strip()
     if ticket_link and not ticket_link.startswith(("http://", "https://")):
@@ -393,9 +442,57 @@ def upload_image():
     return redirect(url_for("dashboard"))
 
 
+# Route for uploading Gallery images related to the event
+@app.route("/admin/upload-gallery", methods=["POST"])
+def upload_gallery():
+
+    if not session.get("admin"):
+        abort(403)
+    #Getting event id from the form
+    event_id = request.form.get("event_id")
+    # Validating that an event id was selected
+    if not event_id:
+        return "No event selected", 400
+
+    files = request.files.getlist("images")
+
+    if not files:
+        return "No images selected", 400
+
+    # Connecting to the database
+    connection = get_db_connection()
+
+    for file in files:
+
+        if not file or not file.filename:
+            continue
+
+        if not allowed_file(file.filename):
+            return "Invalid image type", 400
+
+        filename = secure_filename(file.filename)
+
+        filename = f"{uuid.uuid4().hex}_{filename}"
+        # Saving file into the gallery folder
+        file.save(GALLERY_FOLDER / filename)
+        alt_text = request.form.get("alt", "").strip()
+
+        # Inserting the event id, filename, and alt text (if included)
+        connection.execute("""
+            INSERT INTO gallery_photos (event_id, filename, alt_text)
+            VALUES (?, ?, ?)
+        """, (event_id, filename, alt_text))
+
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("dashboard"))
+
+
+# route for uploading to 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+    return send_from_directory(EVENTS_FOLDER, filename)
 
 #Route for image deletion
 @app.route("/admin/delete/<filename>", methods=["POST"])
@@ -408,6 +505,33 @@ def delete_image(filename):
     remove_event(filename)
 
     return redirect(url_for("dashboard")) 
+
+@app.route("/admin/delete-gallery/<filename>", methods=["POST"])
+def delete_gallery_image(filename):
+
+    if not session.get("admin"):
+        print("No admin session for deletion", flush=True)
+        abort(403)
+
+    remove_gallery_image(filename)
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/admin/event/<int:event_id>/visibility", methods=["POST"])
+def update_event_visibility(event_id):
+    if not session.get("admin"):
+        abort(403)
+
+    is_visible = request.form.get("is_visible") == "1"
+    connection = get_db_connection()
+    connection.execute(
+        "UPDATE events SET is_visible = ? WHERE id = ?",
+        (int(is_visible), event_id)
+    )
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("dashboard"))
 
 #Route for logoout page
 @app.route("/logout")
@@ -458,11 +582,35 @@ def remove_event(image):
 
     connection.close()
 
-    file_path = UPLOAD_FOLDER / image
+    file_path = EVENTS_FOLDER / image
 
     if file_path.exists():
         file_path.unlink()
         print(f"Deleted file: {file_path}", flush=True)
+
+def remove_gallery_image(filename):
+    connection = get_db_connection()
+
+    connection.execute(
+        """
+        DELETE FROM gallery_photos
+        WHERE filename = ?
+        """,
+        (filename,)
+    )
+
+    connection.commit()
+
+    connection.close()
+
+    file_path = GALLERY_FOLDER / filename
+
+
+    if file_path.exists():
+        file_path.unlink()
+        print(f"Deleted file: {file_path}", flush=True)
+    else:
+        print(f"File does not exist: {file_path}", flush=True)
 
 
 if __name__ == "__main__":

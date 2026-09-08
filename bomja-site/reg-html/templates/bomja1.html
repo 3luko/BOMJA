@@ -21,6 +21,7 @@
 
             <div class="navlinks">
                 <a href="#events">Events</a>
+                <a href="#gallery">Gallery</a>
                 <a href="#about">About</a>
                 <a href="#socials">Socials</a>
                 <!-- <a href="#gallery">Gallery</a> -->
@@ -40,6 +41,7 @@
 
         <div class="mobile-menu" id="mobile-menu">
             <a href="#events">Events</a>
+            <a href="#gallery">Gallery</a>
             <a href="#about">About</a>
             <a href="#socials">Socials</a>
             <!-- <a href="#gallery">Gallery</a> -->
@@ -71,21 +73,21 @@
 </section>
 
 <section class="events" id="events">
-    <!-- EVENTS SECTION -->
+    <!-- UPCOMING EVENTS SECTION -->
     <div class="section-title">
         Upcoming Events
     </div>
 
-    <div class="events-controls" aria-label="Event navigation controls">
-        <button class="event-scroll-btn event-scroll-prev" type="button" aria-label="Previous event">
+    <div class="events-controls event-controls" aria-label="Upcoming event navigation controls">
+        <button class="event-scroll-btn event-scroll-prev" type="button" aria-label="Previous upcoming event">
             <span aria-hidden="true">&#8249;</span>
         </button>
-        <button class="event-scroll-btn event-scroll-next" type="button" aria-label="Next event">
+        <button class="event-scroll-btn event-scroll-next" type="button" aria-label="Next upcoming event">
             <span aria-hidden="true">&#8250;</span>
         </button>
     </div>
 
-    <div class="upcoming-events" id="upcoming-events">
+    <div class="upcoming-events event-track" id="upcoming-events">
 
         {% for event in events %}
 
@@ -113,6 +115,46 @@
         {% endfor %}
 
     </div>
+</section>
+
+<section class="events" id="gallery">
+    <div class="section-title">
+        Photo Gallery
+    </div>
+
+    <div class="events-controls gallery-controls" aria-label="Past event gallery navigation controls">
+        <button class="event-scroll-btn gallery-scroll-prev" type="button" aria-label="Previous past event">
+            <span aria-hidden="true">&#8249;</span>
+        </button>
+        <button class="event-scroll-btn gallery-scroll-next" type="button" aria-label="Next past event">
+            <span aria-hidden="true">&#8250;</span>
+        </button>
+    </div>
+
+    <div class="upcoming-events gallery-event-track" id="past-events">
+
+        {% for event in gallery_events %}
+
+            <div class="event">
+
+                <a
+                    class="event-link"
+                    href="{{ url_for('event_gallery', event_id=event['id']) }}"
+                >
+
+                    <img
+                        src="{{ url_for('uploaded_file', filename=event['image']) }}"
+                        alt="{{ event['alt'] }}"
+                    >
+
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
 </section>
 
     <main>
@@ -458,49 +500,6 @@
 
 </section>
 
-        <!-- <section id="gallery">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Past Events Gallery
-                </h2>
-
-                <a
-                    class="gallery-link"
-                    href="https://www.dropbox.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    View full archive
-                </a>
-            </div>
-
-            <div class="gallery-grid" aria-label="Gallery of past BOMJA events">
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA001-21.png" alt="BOMJA event crowd">
-                </figure>
-
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA002-93.png" alt="People enjoying a BOMJA performance">
-                </figure>
-
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA001-40.png" alt="BOMJA event atmosphere">
-                </figure>
-
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA001-43.png" alt="Backstage or stage moment from BOMJA">
-                </figure>
-
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA001-21.png" alt="Another moment from a past BOMJA event">
-                </figure>
-
-                <figure class="gallery-card">
-                    <img src="static\visuals\BOMJA001-43.png" alt="Community gathering at BOMJA">
-                </figure>
-            </div>
-        </section> -->
-
         <!-- Email List -->
         <section id="list">
             <h2 class="section-title">
@@ -533,7 +532,7 @@
                     class="input"
                     name="name"
                     placeholder="Name"
-                    required
+                    cha
                 >
 
                 <input
