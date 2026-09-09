@@ -28,16 +28,89 @@
             <div class="gallery-grid" aria-label="Photos from {{ event['alt'] }}">
                 {% for photo in photos %}
                 <figure class="gallery-card">
-                    <img
-                        src="{{ url_for('gallery_uploaded_file', filename=photo['filename']) }}"
-                        alt="{{ photo['alt_text'] or event['alt'] }}"
-                        loading="lazy"
-                        decoding="async"
+                    <button
+                        class="gallery-photo-trigger"
+                        type="button"
+                        data-photo-url="{{ url_for('gallery_uploaded_file', filename=photo['filename']) }}"
+                        data-download-name="{{ photo['filename'] }}"
+                        data-alt="{{ photo['alt_text'] or event['alt'] }}"
+                        data-delete-url="{{ url_for('delete_gallery_image', filename=photo['filename']) }}"
+                        aria-label="Expand {{ photo['alt_text'] or photo['filename'] }}"
                     >
+                        <img
+                            src="{{ url_for('gallery_uploaded_file', filename=photo['filename']) }}"
+                            alt="{{ photo['alt_text'] or event['alt'] }}"
+                            loading="lazy"
+                            decoding="async"
+                        >
+                    </button>
                 </figure>
                 {% endfor %}
             </div>
         </section>
     </main>
+
+    <div class="gallery-lightbox" id="galleryLightbox" hidden>
+        <div class="gallery-lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="galleryLightboxTitle">
+            <button class="gallery-lightbox-close" id="galleryLightboxClose" type="button" aria-label="Close expanded photo">&times;</button>
+            <img class="gallery-lightbox-image" id="galleryLightboxImage" src="" alt="">
+            <h2 id="galleryLightboxTitle" class="gallery-lightbox-title"></h2>
+            <div class="gallery-lightbox-actions">
+                <a class="btn" id="galleryLightboxDownload" href="" download>Download Photo</a>
+                {% if session.get('admin') %}
+                <form id="galleryLightboxDelete" method="POST" onsubmit="return confirm('Are you sure you want to remove this image?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn danger" type="submit">Delete Photo</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const galleryLightbox = document.getElementById('galleryLightbox');
+        const galleryLightboxImage = document.getElementById('galleryLightboxImage');
+        const galleryLightboxTitle = document.getElementById('galleryLightboxTitle');
+        const galleryLightboxDownload = document.getElementById('galleryLightboxDownload');
+        const galleryLightboxDelete = document.getElementById('galleryLightboxDelete');
+
+        function closeGalleryLightbox() {
+            galleryLightbox.hidden = true;
+            document.body.classList.remove('gallery-lightbox-open');
+            galleryLightboxImage.src = '';
+        }
+
+        document.querySelectorAll('.gallery-photo-trigger').forEach((trigger) => {
+            trigger.addEventListener('click', () => {
+                const photoUrl = trigger.dataset.photoUrl;
+                const altText = trigger.dataset.alt;
+
+                galleryLightboxImage.src = photoUrl;
+                galleryLightboxImage.alt = altText;
+                galleryLightboxTitle.textContent = altText;
+                galleryLightboxDownload.href = photoUrl;
+                galleryLightboxDownload.download = trigger.dataset.downloadName;
+
+                if (galleryLightboxDelete) {
+                    galleryLightboxDelete.action = trigger.dataset.deleteUrl;
+                }
+
+                galleryLightbox.hidden = false;
+                document.body.classList.add('gallery-lightbox-open');
+            });
+        });
+
+        document.getElementById('galleryLightboxClose').addEventListener('click', closeGalleryLightbox);
+        galleryLightbox.addEventListener('click', (event) => {
+            if (event.target === galleryLightbox) {
+                closeGalleryLightbox();
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !galleryLightbox.hidden) {
+                closeGalleryLightbox();
+            }
+        });
+    </script>
 </body>
 </html>

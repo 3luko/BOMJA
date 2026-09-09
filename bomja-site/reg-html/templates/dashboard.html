@@ -119,17 +119,8 @@
 
                         <div class="gallery-card">
 
-                            <img
-                                src="{{ url_for(
-                                    'gallery_uploaded_file',
-                                    filename=item['filename']
-                                ) }}"
-                                alt="{{ item['alt_text'] }}"
-                                class="gallery-admin-image"
-                            >
-
                             <div class="gallery-card-info">
-                                <p>{{ item["alt_text"] }}</p>
+                                <p>{{ item["filename"] }}</p>
 
                                 <form
                                     action="{{ url_for(
