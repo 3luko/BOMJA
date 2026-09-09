@@ -31,6 +31,8 @@
                     <img
                         src="{{ url_for('static', filename='uploads/gallery/' + photo['filename']) }}"
                         alt="{{ photo['alt_text'] or event['alt'] }}"
+                        loading="lazy"
+                        decoding="async"
                     >
                 </figure>
                 {% endfor %}

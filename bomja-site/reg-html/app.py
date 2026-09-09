@@ -165,7 +165,7 @@ if not app.secret_key:
 
 csrf = CSRFProtect(app)
 
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Limit upload size to 16MB
+app.config["MAX_CONTENT_LENGTH"] = 128 * 1024 * 1024  # Limit upload size to 16MB
 
 IS_PRODUCTION = os.getenv("FLASK_ENV") == "production"
 app.config.update(
