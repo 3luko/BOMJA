@@ -571,27 +571,76 @@ def add_event(image, alt, event_ticket_link):
 
     connection.close()
 
-# Function to remove an event from the database
 def remove_event(image):
     connection = get_db_connection()
 
-    connection.execute(
+    # Find the event first
+    event = connection.execute(
         """
-        DELETE FROM events
+        SELECT id
+        FROM events
         WHERE image = ?
         """,
         (image,)
+    ).fetchone()
+
+    if not event:
+        connection.close()
+        return
+
+    event_id = event["id"]
+
+    # Get all gallery photos connected to this event
+    gallery_photos = connection.execute(
+        """
+        SELECT filename
+        FROM gallery_photos
+        WHERE event_id = ?
+        """,
+        (event_id,)
+    ).fetchall()
+
+    # Delete gallery database rows first
+    connection.execute(
+        """
+        DELETE FROM gallery_photos
+        WHERE event_id = ?
+        """,
+        (event_id,)
+    )
+
+    # Now the event can safely be deleted
+    connection.execute(
+        """
+        DELETE FROM events
+        WHERE id = ?
+        """,
+        (event_id,)
     )
 
     connection.commit()
-
     connection.close()
 
-    file_path = EVENTS_FOLDER / image
+    # Delete associated gallery files
+    for photo in gallery_photos:
+        gallery_path = GALLERY_FOLDER / photo["filename"]
 
-    if file_path.exists():
-        file_path.unlink()
-        print(f"Deleted file: {file_path}", flush=True)
+        if gallery_path.exists():
+            gallery_path.unlink()
+            print(
+                f"Deleted gallery file: {gallery_path}",
+                flush=True
+            )
+
+    # Delete event flyer
+    event_path = EVENTS_FOLDER / image
+
+    if event_path.exists():
+        event_path.unlink()
+        print(
+            f"Deleted event file: {event_path}",
+            flush=True
+        )
 
 def remove_gallery_image(filename):
     connection = get_db_connection()
