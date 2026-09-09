@@ -489,10 +489,15 @@ def upload_gallery():
     return redirect(url_for("dashboard"))
 
 
-# route for uploading to 
+# route for uploading event flyers
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(EVENTS_FOLDER, filename)
+
+# route for uploading to gallery folder photos
+@app.route("/gallery-uploads/<filename>")
+def gallery_uploaded_file(filename):
+    return send_from_directory(GALLERY_FOLDER, filename)
 
 #Route for image deletion
 @app.route("/admin/delete/<filename>", methods=["POST"])

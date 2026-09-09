@@ -121,8 +121,8 @@
 
                             <img
                                 src="{{ url_for(
-                                    'static',
-                                    filename='uploads/gallery/' + item['filename']
+                                    'gallery_uploaded_file',
+                                    filename=item['filename']
                                 ) }}"
                                 alt="{{ item['alt_text'] }}"
                                 class="gallery-admin-image"
