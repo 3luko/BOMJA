@@ -108,12 +108,20 @@
             <div class="gallery-event">
 
                 <div class="gallery-event-header">
-                    <h3>{{ photos[0]["event_name"] }}</h3>
-                    <p>{{ photos|length }} photo(s)</p>
+                    <button
+                        type="button"
+                        class="gallery-event-toggle"
+                        aria-expanded="false"
+                        onclick="toggleGalleryEvent(this)">
+                        <span>
+                            <strong>{{ photos[0]["event_name"] }}</strong>
+                            <small>{{ photos|length }} photo(s)</small>
+                        </span>
+                        <span class="gallery-event-toggle-icon" aria-hidden="true">+</span>
+                    </button>
                 </div>
 
-
-                <div class="gallery-grid">
+                <div class="gallery-grid" hidden>
 
                     {% for item in photos %}
 
@@ -244,11 +252,33 @@
 
         // Functions for the Gallery Image Section form
         function openAddGalleryImage(){
-            document.getElementById("addGalleryImagePanel").style.display = "block";
+            const panel = document.getElementById("addGalleryImagePanel");
+            panel.style.display = "block";
+            panel.scrollIntoView({ behavior: "smooth", block: "start" });
+            document.getElementById("galleryImages").focus({ preventScroll: true });
         }
 
         function closeAddGalleryImage(){
             document.getElementById("addGalleryImagePanel").style.display = "none";
+        }
+
+        function toggleGalleryEvent(button) {
+            const galleryEvent = button.closest(".gallery-event");
+            const galleryGrid = galleryEvent.querySelector(".gallery-grid");
+            const isOpening = galleryGrid.hidden;
+
+            document.querySelectorAll(".gallery-event .gallery-grid").forEach(function (grid) {
+                grid.hidden = true;
+                const toggle = grid.closest(".gallery-event").querySelector(".gallery-event-toggle");
+                toggle.setAttribute("aria-expanded", "false");
+                toggle.querySelector(".gallery-event-toggle-icon").textContent = "+";
+            });
+
+            if (isOpening) {
+                galleryGrid.hidden = false;
+                button.setAttribute("aria-expanded", "true");
+                button.querySelector(".gallery-event-toggle-icon").textContent = "-";
+            }
         }
     </script>
 </body>
