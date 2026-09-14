@@ -62,14 +62,48 @@ def init_db():
         )
     """)
 
-    # connection.execute("""
-    #     CREATE TABLE IF NOT EXISTS slideshow_photos (
-    #         id INTEGER PRIMARY KEY AUTOINCREMENT,
-    #         filename TEXT NOT NULL,
-    #         alt_text TEXT,
-    #         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    #     )
-    # """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS slideshow_photos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            filename TEXT NOT NULL,
+            alt_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS site_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
+
+    slideshow_count = connection.execute(
+        "SELECT COUNT(*) FROM slideshow_photos"
+    ).fetchone()[0]
+    if slideshow_count == 0:
+        connection.executemany(
+            """
+            INSERT INTO slideshow_photos (filename, alt_text)
+            VALUES (?, ?)
+            """,
+            [
+                ("visuals/BOMJA001-21.png", "BOMJA event image"),
+                ("visuals/BOMJA002-93.png", "BOMJA event image"),
+                ("visuals/BOMJA001-40.png", "BOMJA event image"),
+                ("visuals/BOMJA001-43.png", "BOMJA event image"),
+            ]
+        )
+
+    default_ticket_url = "https://linktr.ee/bomja?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAcGRvZgJleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAac6331DnS-VMpZp-ChK1-P46oWhYBzeVTqMYaWlmAJZQw0vWiWiERGP4wP8HQ_aem_MSE-sSSs678j71U3RAZjPA"
+    existing_ticket_setting = connection.execute(
+        "SELECT value FROM site_settings WHERE key = 'tickets_url'"
+    ).fetchone()
+    if not existing_ticket_setting:
+        connection.execute(
+            "INSERT INTO site_settings (key, value) VALUES (?, ?)",
+            ("tickets_url", default_ticket_url)
+        )
 
     connection.commit()
     connection.close()
@@ -142,9 +176,17 @@ GALLERY_FOLDER = Path(
     )
 )
 
+SLIDESHOW_FOLDER = Path(
+    os.getenv(
+        "SLIDESHOW_FOLDER",
+        BASE_DIR / "static" / "uploads" / "slideshow"
+    )
+)
+
 
 EVENTS_FOLDER.mkdir(parents=True, exist_ok=True)
 GALLERY_FOLDER.mkdir(parents=True, exist_ok=True)
+SLIDESHOW_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
@@ -184,6 +226,15 @@ print("http://127.0.0.1:5000")
   
 
 
+def get_site_setting(key, default=""):
+    connection = get_db_connection()
+    row = connection.execute(
+        "SELECT value FROM site_settings WHERE key = ?",
+        (key,)
+    ).fetchone()
+    connection.close()
+    return row["value"] if row else default
+
 #Route for home page
 @app.route("/")
 def home():
@@ -209,11 +260,21 @@ def home():
         ORDER BY events.id DESC
     """).fetchall()
 
+    slideshow_photos = connection.execute("""
+        SELECT id, filename, alt_text
+        FROM slideshow_photos
+        ORDER BY id ASC
+    """).fetchall()
+
+    tickets_url = get_site_setting("tickets_url", "https://linktr.ee/bomja")
+
     connection.close()
 
     return render_template("bomja1.html",
                            events=events,
-                           gallery_events=gallery_events)
+                           gallery_events=gallery_events,
+                           slideshow_photos=slideshow_photos,
+                           tickets_url=tickets_url)
 
 
 @app.route("/gallery/<int:event_id>")
@@ -322,6 +383,11 @@ def dashboard():
         ON gallery_photos.event_id = events.id
     ORDER BY events.id DESC
 """).fetchall()
+    slideshow_photos = connection.execute("""
+        SELECT id, filename, alt_text
+        FROM slideshow_photos
+        ORDER BY id ASC
+    """).fetchall()
 
     gallery_by_event = defaultdict(list)
 
@@ -330,10 +396,14 @@ def dashboard():
 
     connection.close()
 
+    tickets_url = get_site_setting("tickets_url", "https://linktr.ee/bomja")
+
     return render_template(
         "dashboard.html",
         events=events,
-        gallery_by_event=gallery_by_event
+        gallery_by_event=gallery_by_event,
+        slideshow_photos=slideshow_photos,
+        tickets_url=tickets_url
     )
 
 
@@ -400,7 +470,8 @@ def mail_list():
 # Route for the Tickets tab
 @app.route("/tickets")
 def ticket():
-    return render_template("tickets.html")
+    tickets_url = get_site_setting("tickets_url", "https://linktr.ee/bomja")
+    return redirect(tickets_url, code=302)
 
 
 #ROute for Event upload
@@ -489,6 +560,35 @@ def upload_gallery():
     return redirect(url_for("dashboard"))
 
 
+@app.route("/admin/upload-slideshow", methods=["POST"])
+def upload_slideshow():
+    if not session.get("admin"):
+        abort(403)
+
+    file = request.files.get("image")
+    if not file or not file.filename:
+        return "No image selected", 400
+
+    if not allowed_file(file.filename):
+        return "Invalid image type", 400
+
+    filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
+    file.save(SLIDESHOW_FOLDER / filename)
+
+    connection = get_db_connection()
+    connection.execute(
+        """
+        INSERT INTO slideshow_photos (filename, alt_text)
+        VALUES (?, ?)
+        """,
+        (f"uploads/slideshow/{filename}", request.form.get("alt", "").strip())
+    )
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("dashboard"))
+
+
 # route for uploading event flyers
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
@@ -498,6 +598,11 @@ def uploaded_file(filename):
 @app.route("/gallery-uploads/<filename>")
 def gallery_uploaded_file(filename):
     return send_from_directory(GALLERY_FOLDER, filename)
+
+
+@app.route("/slideshow-uploads/<path:filename>")
+def slideshow_file(filename):
+    return send_from_directory(BASE_DIR / "static", filename)
 
 #Route for image deletion
 @app.route("/admin/delete/<filename>", methods=["POST"])
@@ -519,6 +624,52 @@ def delete_gallery_image(filename):
         abort(403)
 
     remove_gallery_image(filename)
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/admin/delete-slideshow/<int:photo_id>", methods=["POST"])
+def delete_slideshow(photo_id):
+    if not session.get("admin"):
+        abort(403)
+
+    connection = get_db_connection()
+    photo = connection.execute(
+        "SELECT filename FROM slideshow_photos WHERE id = ?",
+        (photo_id,)
+    ).fetchone()
+    if not photo:
+        connection.close()
+        abort(404)
+
+    connection.execute("DELETE FROM slideshow_photos WHERE id = ?", (photo_id,))
+    connection.commit()
+    connection.close()
+
+    if photo["filename"].startswith("uploads/slideshow/"):
+        (BASE_DIR / "static" / photo["filename"]).unlink(missing_ok=True)
+
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/admin/update-tickets-link", methods=["POST"])
+def update_tickets_link():
+    if not session.get("admin"):
+        abort(403)
+
+    tickets_url = request.form.get("tickets_url", "").strip()
+    if not tickets_url:
+        return "Ticket link is required", 400
+    if not tickets_url.startswith(("http://", "https://")):
+        return "Ticket link must start with http:// or https://", 400
+
+    connection = get_db_connection()
+    connection.execute(
+        "INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        ("tickets_url", tickets_url)
+    )
+    connection.commit()
+    connection.close()
+
     return redirect(url_for("dashboard"))
 
 

@@ -14,6 +14,96 @@
 
     <div class="container">
 
+        <div class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Slideshow Pictures</h2>
+                    <p>Update the pictures shown in the homepage slideshow.</p>
+                </div>
+                <button type="button" class="add-event-btn" onclick="openAddSlideshow()">
+                    + Add Slideshow Picture
+                </button>
+            </div>
+
+            {% if slideshow_photos %}
+            <div class="slideshow-admin-grid">
+                {% for photo in slideshow_photos %}
+                <div class="gallery-card">
+                    <img
+                        class="slideshow-admin-image"
+                        src="{{ url_for('slideshow_file', filename=photo['filename']) }}"
+                        alt="{{ photo['alt_text'] }}"
+                    >
+                    <div class="gallery-card-info">
+                        <p>{{ photo['alt_text'] }}</p>
+                        <form
+                            action="{{ url_for('delete_slideshow', photo_id=photo['id']) }}"
+                            method="POST"
+                            onsubmit="return confirm('Are you sure you want to remove this slideshow picture?');"
+                        >
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="remove-event-btn">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-events">
+                <h3>No Slideshow Pictures</h3>
+                <p>Add a picture to show it on the homepage.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card add-event-panel" id="addSlideshowPanel" style="display: none;">
+            <h2>Add Slideshow Picture</h2>
+            <p>Upload a picture for the homepage slideshow.</p>
+
+            <form action="{{ url_for('upload_slideshow') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <label for="slideshowImage">Picture</label>
+                <input type="file" name="image" id="slideshowImage" accept="image/png, image/jpeg, image/gif" required>
+
+                <br><br>
+
+                <label for="slideshowAlt">Alt Text</label>
+                <input type="text" name="alt" id="slideshowAlt" placeholder="Describe the picture" required>
+
+                <br><br>
+
+                <div class="form-buttons">
+                    <button type="submit" class="save-event-btn">Add Picture</button>
+                    <button type="button" class="cancel-btn" onclick="closeAddSlideshow()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Tickets Link</h2>
+                    <p>Choose the destination for the Tickets and Buy Tickets buttons.</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('update_tickets_link') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="ticketsUrl">Tickets URL</label>
+                <input
+                    type="url"
+                    id="ticketsUrl"
+                    name="tickets_url"
+                    value="{{ tickets_url }}"
+                    placeholder="https://your-ticket-link.com"
+                    required
+                >
+                <br><br>
+                <button type="submit" class="save-event-btn">Save Tickets Link</button>
+            </form>
+        </div>
+
         <div class="card events-card">
             <div class="section-header">
                 <div>
@@ -248,6 +338,17 @@
 
         function closeAddEvent() {
             document.getElementById("addEventPanel").style.display = "none";
+        }
+
+        function openAddSlideshow() {
+            const panel = document.getElementById("addSlideshowPanel");
+            panel.style.display = "block";
+            panel.scrollIntoView({ behavior: "smooth", block: "start" });
+            document.getElementById("slideshowImage").focus({ preventScroll: true });
+        }
+
+        function closeAddSlideshow() {
+            document.getElementById("addSlideshowPanel").style.display = "none";
         }
 
         // Functions for the Gallery Image Section form

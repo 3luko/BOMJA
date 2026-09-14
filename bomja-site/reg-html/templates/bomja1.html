@@ -34,7 +34,7 @@
                 <span></span>
             </button>
 
-            <a class="btn nav-ticket" href="{{ url_for('ticket') }}">
+            <a class="btn nav-ticket" href="{{ tickets_url }}" target="_blank" rel="noopener noreferrer">
                 Tickets
             </a>
         </nav>
@@ -50,21 +50,11 @@
         </div>
     </header>
     <section class="slideshow">
-    <div class="slides fade">
-        <img src="static\visuals\BOMJA001-21.png" alt="">
-    </div>
-
-    <div class="slides fade">
-        <img src="static\visuals\BOMJA002-93.png" alt="">
-    </div>
-
-    <div class="slides fade">
-        <img src="static\visuals\BOMJA001-40.png" alt="">
-    </div>
-
-    <div class="slides fade">
-        <img src="static\visuals\BOMJA001-43.png" alt="">
-    </div>
+    {% for photo in slideshow_photos %}
+        <div class="slides fade">
+            <img src="{{ url_for('slideshow_file', filename=photo['filename']) }}" alt="{{ photo['alt_text'] }}">
+        </div>
+    {% endfor %}
 
     <div class="overlay">
         <h1>BOMJA</h1>
@@ -179,7 +169,7 @@
         </p>
 
         <p>
-            <a class="btn" href="{{ url_for('ticket') }}">
+            <a class="btn" href="{{ tickets_url }}" target="_blank" rel="noopener noreferrer">
                 Buy Tickets
             </a>
 
@@ -200,7 +190,13 @@
                 Celebrations of who we are — and who we are together.
             </p>
 
-            <a class="btn" href="https://linktr.ee/bomja?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAcGRvZgJleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAac6331DnS-VMpZp-ChK1-P46oWhYBzeVTqMYaWlmAJZQw0vWiWiERGP4wP8HQ_aem_MSE-sSSs678j71U3RAZjPA" target="_blank" rel="noopener norefferer">
+            <a
+                class="btn"
+                href="https://linktr.ee/bomja?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAcGRvZgJleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAac6331DnS-VMpZp-ChK1-P46oWhYBzeVTqMYaWlmAJZQw0vWiWiERGP4wP8HQ_aem_MSE-sSSs678j71U3RAZjPA"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Get Access to BOMJA"
+            >
                 Get Access
             </a>
         </div>

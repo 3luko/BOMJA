@@ -1201,6 +1201,13 @@ video {
 
     .hero-card::before {
         inset: 17px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .hero-card > * {
+        position: relative;
+        z-index: 1;
     }
 
     .hero-card img {
