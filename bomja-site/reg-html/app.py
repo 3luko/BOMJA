@@ -7,7 +7,6 @@ import bcrypt
 import os
 import sqlite3
 import uuid
-import requests
 from collections import defaultdict
 
 
@@ -405,65 +404,6 @@ def dashboard():
         slideshow_photos=slideshow_photos,
         tickets_url=tickets_url
     )
-
-
-# Route to get to the mailing list page (NOT READY)
-@app.route("/mail-list", methods=["POST"])
-def mail_list():
-
-    name = request.form.get("name", "").strip()
-    email = request.form.get("email", "").strip().lower()
-
-
-    #Mailchimp Config
-    api_key = os.getenv("MAILCHIMP_API_KEY")
-    audience_id = os.getenv("MAILCHIMP_AUDIENCE_ID")
-    server_prefix = os.getenv("MAILCHIMP_SERVER_PREFIX")
-
-    # Mailchimp url
-    url = f"https://{server_prefix}.api.mailchimp.com/3.0/lists/{audience_id}/members/"
-
-    data = {
-        "email_address": email,
-        "status": "subscribed",
-        "merge_fields": {
-            "FNAME": name
-        }
-    }
-
-    try:
-        response = requests.post(
-            url,
-            auth=("anystring", api_key),
-            json=data
-        )
-
-        if response.status_code == 200:
-            print("Successfully subscribed!")
-            flash("Thanks for joining the BOMJA list!", "success")
-        elif response.status_code == 400:
-            flash("You're already on the BOMJA list!", "info")
-            error = response.json()
-            print(
-                "Mailchimp rejected subscriber",
-                error.get("title"),
-                error.get("detail"),
-                flush=True
-            )
-        else:
-            print(
-                "Mailchimp error:",
-                response.status_code,
-                response.text,
-                flush=True
-            )
-            flash("Something went wrong. Please try again.", "error")
-
-    except requests.RequestException as e:
-        print("Mailchimp connection error:", e, flush=True)
-        flash("Something went wrong. Please try again.", "error")
-
-    return redirect(url_for("home"))
 
 
 

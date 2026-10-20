@@ -2,53 +2,50 @@
 
 **Sound That Brings Us Together.**
 
-BOMJA is an event and community platform built to showcase upcoming events, connect visitors with ticketing platforms, and provide administrators with a simple way to manage event content and public-facing media.
+BOMJA is an event and community platform built to showcase upcoming events, connect visitors with ticketing platforms, and provide administrators with a simple way to manage event content.
 
 The website is built with Flask, SQLite, HTML, CSS, and JavaScript.
 
 ## Features
 
-- Responsive desktop and mobile design
-- Dynamic upcoming event listings
-- Direct ticket links for events and homepage CTAs
-- Secure administrator login
-- Admin dashboard for managing content
-- Event image uploads
-- Event deletion and visibility toggling
-- Gallery image uploads for past events
-- Homepage slideshow management
-- Shared ticket destination configuration
-- Persistent data using SQLite
-- CSRF protection
-- Password hashing with bcrypt
-- Secure file upload handling
-- Responsive event and gallery layouts
-- Environment-based configuration
+* Responsive desktop and mobile design
+* Dynamic upcoming event listings
+* Direct ticket links for events
+* Secure administrator login
+* Admin dashboard
+* Event image uploads
+* Event deletion
+* Persistent event data using SQLite
+* CSRF protection
+* Password hashing with bcrypt
+* Secure file upload handling
+* Responsive event carousel
+* Environment-based configuration
 
 ## Tech Stack
 
-### Backend
+**Backend**
 
-- Python
-- Flask
-- SQLite
-- Gunicorn
+* Python
+* Flask
+* SQLite
+* Gunicorn
 
-### Frontend
+**Frontend**
 
-- HTML
-- CSS
-- JavaScript
-- Jinja2
+* HTML
+* CSS
+* JavaScript
+* Jinja2
 
-### Security
+**Security**
 
-- bcrypt password verification
-- Flask-WTF CSRF protection
-- Secure Flask sessions
-- Restricted upload file types
-- Secure filename handling
-- Environment variables for credentials and secrets
+* bcrypt password verification
+* Flask-WTF CSRF protection
+* Secure Flask sessions
+* Restricted file extensions
+* Secure filename handling
+* Environment variables for credentials and secrets
 
 ## Project Structure
 
@@ -57,33 +54,23 @@ BOMJA/reg-html
 │
 ├── app.py
 ├── requirements.txt
-├── .env
-├── .gitignore
 ├── README.md
+├── .gitignore
 │
 ├── templates/
 │   ├── bomja1.html
-│   ├── dashboard.html
-│   ├── event_gallery.html
 │   ├── login.html
-│   └── tickets.html
+│   ├── tickets.html
+│   └── dashboard.html
 │
 ├── static/
-│   ├── admin.css
-│   ├── bomja-style.css
-│   ├── uploads/
-│   │   ├── events/
-│   │   ├── gallery/
-│   │   └── slideshow/
-│   ├── visuals/
-│   └── js/
-│       ├── admin.js
-│       └── bomja.js
+│   ├── css/
+│   ├── js/
+│   └── uploads/
+│   └── visuals/
 │
-├── data/
-│   └── bomja.db
-│
-└── admin/
+└── data/
+    └── bomja.db
 ```
 
 ## Local Development
@@ -128,16 +115,13 @@ SECRET_KEY=your-secret-key
 ADMIN_USERNAME=your-admin-username
 ADMIN_PASSWORD=your-bcrypt-password-hash
 FLASK_ENV=development
-DATABASE_PATH=data/bomja.db
-UPLOAD_FOLDER=static/uploads
 ```
 
-Optional storage paths can also be customized:
+Optional local storage paths can also be configured:
 
 ```env
-EVENTS_FOLDER=static/uploads/events
-GALLERY_FOLDER=static/uploads/gallery
-SLIDESHOW_FOLDER=static/uploads/slideshow
+DATABASE_PATH=data/bomja.db
+UPLOAD_FOLDER=static/uploads
 ```
 
 > Never commit the `.env` file or production credentials to GitHub.
@@ -166,51 +150,23 @@ Current tables include:
 
 Stores event information including:
 
-- Event ID
-- Event image filename
-- Image alt text
-- Event visibility state
-- Optional event ticket URL
-
-### `gallery_photos`
-
-Stores gallery media related to past events, including:
-
-- Photo ID
-- Linked event ID
-- File name
-- Alt text
-- Upload timestamp
-
-### `slideshow_photos`
-
-Stores homepage slideshow images, including:
-
-- Photo ID
-- File name
-- Alt text
-- Upload timestamp
-
-### `site_settings`
-
-Stores site-wide configuration, including:
-
-- `tickets_url` for homepage and tickets button destinations
+* Event ID
+* Event image
+* Image alt text
+* Ticket URL
 
 ### `pass`
 
 Stores administrator authentication information including:
 
-- Administrator username
-- bcrypt password hash
+* Administrator username
+* bcrypt password hash
 
 The application does not store the administrator's plaintext password.
 
-## Admin Features
+## Event Management
 
-Administrators can log into the dashboard to manage site content.
-
-### Event management
+Administrators can log into the dashboard to manage events.
 
 When an event is uploaded:
 
@@ -221,36 +177,24 @@ When an event is uploaded:
 5. Event information is stored in SQLite.
 6. The event automatically appears on the public website.
 
-Events can optionally include a ticket URL. Events with ticket URLs are clickable and direct visitors to the external ticketing website.
-
-### Gallery management
-
-Administrators can upload and remove images associated with past events, allowing a structured image gallery for each past event.
-
-### Slideshow management
-
-The admin dashboard includes a slideshow section that allows administrators to upload, preview, and remove homepage slideshow images.
-
-### Shared ticket configuration
-
-The site can use a single saved ticket link that powers the homepage and page-level ticket buttons.
+Events can optionally contain a ticket URL. Events with ticket URLs are clickable and direct visitors to the external ticketing website.
 
 ## Security
 
 The application includes several basic production security measures:
 
-- bcrypt password verification
-- CSRF protection
-- HTTP-only session cookies
-- Secure cookies in production
-- SameSite cookie protection
-- File upload size limits
-- Allowed file-extension validation
-- Secure filename handling
-- UUID-based uploaded filenames
-- Parameterized SQLite queries
-- Restricted administrator routes
-- Environment-based secrets
+* bcrypt password verification
+* CSRF protection
+* HTTP-only session cookies
+* Secure cookies in production
+* SameSite cookie protection
+* File upload size limits
+* Allowed file-extension validation
+* Secure filename handling
+* UUID-based uploaded filenames
+* Parameterized SQLite queries
+* Protected administrator routes
+* Environment-based secrets
 
 Sensitive information should never be committed to the repository.
 
@@ -308,16 +252,16 @@ Persistent data such as the SQLite database and uploaded event images should rem
 
 Planned improvements may include:
 
-- Website analytics
-- Event performance analytics
-- Ticket click tracking
-- Visitor tracking
-- Email list integration
-- Expanded admin dashboard
-- Event editing
-- Event scheduling
-- Improved content management
-- Additional administrator tools
+* Website analytics
+* Event performance analytics
+* Ticket click tracking
+* Visitor tracking
+* Email list integration
+* Expanded admin dashboard
+* Event editing
+* Event scheduling
+* Improved content management
+* Additional administrator tools
 
 ## BOMJA
 
